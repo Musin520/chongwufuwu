@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+    <title> - 个人资料</title>
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+
+    <link rel="shortcut icon" href="favicon.ico">
+
+    <link rel="stylesheet" href="/static/webSite/css/swiper-bundle.min.css">
+    <link crossorigin="anonymous" href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.3.0-alpha3/css/bootstrap.min.css"
+          integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" rel="stylesheet">
+    <link href="/static/webSite/css/vendor.css" rel="stylesheet" type="text/css">
+    <link href="/static/webSite/style.css" rel="stylesheet" type="text/css">
+    <script src="/static/DemoBootStrap/js/vue.js"></script>
+    <link href="/static/hAdmin/css/plugins/sweetalert/sweetalert.css" rel="stylesheet">
+    <link href="/static/hAdmin/css/font-awesome.css?v=4.4.0" rel="stylesheet">
+    <link href="/static/hAdmin/css/plugins/toastr/toastr.min.css" rel="stylesheet">
+    <link href="https://unpkg.com/element-ui/lib/theme-chalk/index.css" rel="stylesheet">
+
+    <style>
+        .addList {
+            padding: 10px 30px 10px 30px;
+            height: 90px;
+            margin-top: 3px;
+        }
+
+    </style>
+</head>
+
+<body class="gray-bg">
+ <div id="app">
+
+     <div class="preloader-wrapper">
+         <div class="preloader">
+         </div>
+     </div>
+
+
+     <header v-if="role == '2'">
+         <div class="container-fluid">
+             <div class="row py-3 border-bottom">
+
+                 <div class="col-sm-4 col-lg-2 text-center text-sm-start d-flex gap-3 justify-content-center justify-content-md-start">
+                     <div class="d-flex align-items-center my-3 my-sm-0">
+                         <a href="/web/userindex">
+                             <img alt="logo" class="img-fluid" src="/static/webSite/images/logo.png"
+                                  style="width: 50px;height: 50px;">
+                         </a>
+                     </div>
+                     <button aria-controls="offcanvasNavbar" class="navbar-toggler" data-bs-target="#offcanvasNavbar"
+                             data-bs-toggle="offcanvas"
+                             type="button">
+                         <svg height="24" viewBox="0 0 24 24" width="24">
+                             <use xlink:href="#menu"></use>
+                         </svg>
+                     </button>
+                 </div>
+
+                 <div class="col-md-2 ">
+                     <div class="search-bar row bg-light p-2 rounded-4">
+
+                         <div class="col-11 col-md-10" style="text-align: center">
+                             宠物服务订购平台
+                         </div>
+
+                     </div>
+                 </div>
+
+                 <div class="col-md-8">
+                     <ul class="navbar-nav list-unstyled d-flex flex-row gap-3 gap-lg-5 justify-content-center flex-wrap align-items-center mb-0 fw-bold text-uppercase text-dark">
+                         <li class="nav-item ">
+                             <a class="nav-link" href="/web/userindex">主页</a>
+                         </li>
+
+                         <li class="nav-item">
+                             <a class="nav-link  " href="/web/userproductlist">宠物服务列表</a>
+                         </li>
+                         <li class="nav-item">
+                             <a class="nav-link " href="/web/usercart">购物车</a>
+                         </li>
+                         <li class="nav-item">
+                             <a class="nav-link " href="/web/usercontact">联系我们</a>
+                         </li>
+                         <li class="nav-item">
+                             <a class="nav-link " href="/web/userblog">网站资讯/公告</a>
+                         </li>
+                         <li class="nav-item text-primary" >
+                             <a class="nav-link " href="/web/personal" title="个人中心"><i class="fa fa-user"></i></a>
+                         </li>
+                     </ul>
+                 </div>
+
+
+             </div>
+         </div>
+     </header>
+     <el-card class="box-card">
+     <el-tabs stretch v-model="activeName" @tab-click="handleClick">
+         <el-tab-pane label="用户信息" name="first">
+             <el-descriptions :column="4" title="用户信息" border>
+                 <el-descriptions-item :span="4" label="图片">
+                     <el-image :src="userInfo.img"
+                               style="width: 100px;height: 100px;"></el-image>
+                 </el-descriptions-item>
+                 <el-descriptions-item :span="2" label="用户姓名">{{userInfo.username}}</el-descriptions-item>
+                 <el-descriptions-item :span="2" label="性别">{{userInfo.sex}}</el-descriptions-item>
+                 <el-descriptions-item :span="2" label="联系方式">{{userInfo.phonenumber}}</el-descriptions-item>
+                 <el-descriptions-item :span="2" label="账号">{{userInfo.account}}</el-descriptions-item>
+                 <el-descriptions-item :span="2" label="密码">{{userInfo.password}}</el-descriptions-item>
+                 <el-descriptions-item :span="2" label="证件号">{{userInfo.idcard}}</el-descriptions-item>
+                 <el-descriptions-item :span="2" label="地址信息">{{userInfo.address}}</el-descriptions-item>
+                 <el-descriptions-item :span="2" label="年龄">{{userInfo.age}}</el-descriptions-item>
+                 <el-descriptions-item :span="2" label="创建时间">{{userInfo.createtime}}</el-descriptions-item>
+                 <el-descriptions-item :span="4" label="余额">{{userInfo.money}}</el-descriptions-item>
+                 <el-descriptions-item :span="4" label="个人备注">{{userInfo.remark}}</el-descriptions-item>
+                 <el-descriptions-item :span="4" label="宠物姓名">{{userInfo.petname}}</el-descriptions-item>
+                 <el-descriptions-item :span="4" label="宠物年龄">{{userInfo.petage}}</el-descriptions-item>
+                 <el-descriptions-item :span="4" label="宠物品种">{{userInfo.pettype}}</el-descriptions-item>
+                 <el-descriptions-item :span="4" label="宠物描述">{{userInfo.petdes}}</el-descriptions-item>
+             </el-descriptions>
+             <div style="width: 100%;text-align: center;margin-top: 50px">
+                 <el-button type="danger" v-if="role == '2'" @click="handleLogout">退出登录</el-button>
+                 <el-button type="warning" @click="handleEditUserInfo">修改信息</el-button>
+
+             </div>
+         </el-tab-pane>
+         <el-tab-pane label="我的收藏" v-if="role == '2'" name="second">
+             <el-table
+                     :data="likeList"
+                     style="width: 100%"
+                     v-loading="loading">
+                 <el-table-column
+                         align="center"
+                         label="序号"
+                         prop="id"
+                 >
+                 </el-table-column>
+                 <el-table-column
+                         align="center"
+                         label="图片"
+                         prop="img"
+                 >
+                     <template slot-scope="scope">
+                         <el-image :src="scope.row.img"
+                                   style="width: 100px;height: 100px;"></el-image>
+                     </template>
+                 </el-table-column>
+                 <el-table-column
+                         align="center"
+                         label="标题"
+                         prop="productname"
+                 >
+                 </el-table-column>
+
+                 <el-table-column
+                         align="center"
+                         label="创建时间"
+                         prop="createtime">
+                 </el-table-column>
+
+                 <el-table-column
+                         align="center"
+                         label="操作"
+                         width="350px"
+                 >
+                     <template slot-scope="scope">
+                         <el-button @click="handleDel(scope.row.id)" type="danger" round size="small"><i
+                                 class="fa fa-close"></i> 取消收藏
+                         </el-button>
+                     </template>
+                 </el-table-column>
+             </el-table>
+         </el-tab-pane>
+         <el-tab-pane label="我的订单" v-if="role == '2'" name="third">
+             <!--            列表          -->
+             <div class="project-list">
+                 <div class="ibox-content">
+                     <el-table
+                             :data="orderList"
+                             style="width: 100%"
+                             v-loading="loading">
+                         <el-table-column
+                                 align="center"
+
+                                 type="expand"
+                                 prop="id"
+                         >
+                             <template slot-scope="scope">
+
+                                 <el-table v-if="scope.row.cartList" :data="scope.row.cartList">
+                                     <el-table-column
+                                             align="center"
+                                             label="图片"
+                                             prop="img"
+                                     >
+                                         <template slot-scope="scopeInner">
+                                             <el-image :src="scopeInner.row.product.img"
+                                                       style="width: 100px;height: 100px;"></el-image>
+                                         </template>
+                                     </el-table-column>
+                                     <el-table-column
+                                             align="center"
+                                             label="宠物服务名称"
+                                             prop="product.productname"
+                                     >
+
+                                     </el-table-column>
+                                     <el-table-column
+                                             align="center"
+                                             label="单价"
+                                             prop="product.kedanjia"
+                                     >
+
+                                     </el-table-column>
+                                     <el-table-column
+                                             align="center"
+                                             label="数量"
+                                             prop="number"
+                                     >
+
+                                     </el-table-column>
+
+                                     <el-table-column
+                                             align="center"
+                                             label="总价"
+
+                                     >
+                                         <template slot-scope="scopeInner">
+                                             {{parseFloat(scopeInner.row.product.kedanjia)*scopeInner.row.number}}
+                                         </template>
+                                     </el-table-column>
+
+                                 </el-table>
+                             </template>
+                         </el-table-column>
+                         <el-table-column
+                                 align="center"
+                                 label="订单id"
+                                 prop="id"
+                         >
+
+                         </el-table-column>
+
+                         <el-table-column
+                                 align="center"
+                                 label="下单用户"
+                                 prop="username">
+                         </el-table-column>
+                         <el-table-column
+                                 align="center"
+                                 label="下单时间"
+                                 prop="createtime">
+                         </el-table-column>
+
+                         <el-table-column
+                                 align="center"
+                                 label="更新时间"
+                                 prop="updatetime">
+                         </el-table-column>
+                         <el-table-column
+                                 align="center"
+                                 label="商家备注"
+                                 prop="remark"
+                         >
+
+                         </el-table-column>
+                         <el-table-column
+                                 align="center"
+                                 label="评价"
+                                 prop="content"
+                         >
+
+                         </el-table-column>
+                         <el-table-column
+                                 align="center"
+                                 label="操作"
+                                 width="350px"
+                         >
+                             <template slot-scope="scope">
+                                 <el-button @click="handleDelOrder(scope.row.id)" round size="small"
+
+                                            type="danger"><i class="fa fa-close"></i> 取消
+                                 </el-button>
+                                 <el-button @click="handleEvalute(scope.row)" round size="small"
+v-if="!scope.row.content"
+                                            type="primary"><i class="fa fa-edit"></i> 评价
+                                 </el-button>
+                             </template>
+                         </el-table-column>
+                     </el-table>
+                 </div>
+             </div>
+
+         </el-tab-pane>
+         <el-tab-pane label="我的消息" v-if="role == '2'" name="fourth">
+             <!--            列表          -->
+             <div class="project-list">
+                 <div class="ibox-content">
+                     <el-table
+                             :data="msgList"
+                             style="width: 100%"
+                             v-loading="loading">
+                         <el-table-column
+                                 align="center"
+                                 label="id"
+                                 prop="id"
+                         >
+                         </el-table-column>
+
+                         <el-table-column
+                                 align="center"
+                                 label="消息"
+                                 prop="content"
+                         >
+                         </el-table-column>
+
+                         <el-table-column
+                                 align="center"
+                                 label="发送人"
+                                 prop="senderName">
+                         </el-table-column>
+                         <el-table-column
+                                 align="center"
+                                 label="状态"
+                                 prop="status">
+                             <template slot-scope="scope">
+                                 <el-tag type="info" v-if="scope.row.status == '1'">已回复</el-tag>
+                                 <el-tag type="danger" v-if="scope.row.status == '0'">未回复</el-tag>
+                             </template>
+                         </el-table-column>
+                         <el-table-column
+                                 align="center"
+                                 label="发送时间"
+                                 prop="createtime">
+                         </el-table-column>
+                         <el-table-column
+                                 align="center"
+                                 label="更新时间"
+                                 prop="updatetime">
+                         </el-table-column>
+                         <el-table-column
+                                 align="center"
+                                 label="操作"
+                                 width="350px"
+                         >
+                             <template slot-scope="scope">
+
+                                 <el-button @click="handleEdit(scope.row)" round size="small" type="warning">
+                                     <i class="fa fa-pencil"></i> 回复
+                                 </el-button>
+                                 <el-button @click="handleDel(scope.row.id)" round size="small"
+                                            type="danger"><i class="fa fa-trash"></i> 删除
+                                 </el-button>
+                             </template>
+                         </el-table-column>
+                     </el-table>
+                 </div>
+             </div>
+         </el-tab-pane>
+     </el-tabs>
+     </el-card>
+     <el-dialog :title="title" :visible.sync="open" width="50%">
+         <el-form :model="form" :rules="rules" label-width="80px" ref="form">
+             <el-form-item label="图片">
+                 <el-upload
+                         :action="baseUrl+'/common/upload'"
+                         :before-remove="beforeRemove"
+                         :file-list="fileList"
+                         :limit="1"
+
+                         :on-remove="handleRemove"
+                         :on-success="handleFileSuccess"
+                         class="upload-demo"
+                         multiple>
+                     <i class="el-icon-upload"></i>
+                     <div class="el-upload__text">将图片拖到此处，或<em>点击上传</em></div>
+
+                     <el-button size="small" type="primary">点击上传</el-button>
+
+                 </el-upload>
+             </el-form-item>
+             <el-form-item label="用户姓名" prop="username">
+                 <el-input v-model="form.username"></el-input>
+             </el-form-item>
+             <el-form-item label="性别">
+                 <el-input type="text" v-model="form.sex"></el-input>
+             </el-form-item>
+             <el-form-item label="联系方式">
+                 <el-input v-model="form.phonenumber"></el-input>
+             </el-form-item>
+             <el-form-item label="账号">
+                 <el-input v-model="form.account"></el-input>
+             </el-form-item>
+             <el-form-item label="密码">
+                 <el-input v-model="form.password"></el-input>
+             </el-form-item>
+             <el-form-item label="证件号">
+                 <el-input v-model="form.idcard"></el-input>
+             </el-form-item>
+             <el-form-item label="地址信息">
+                 <el-input v-model="form.address"></el-input>
+             </el-form-item>
+             <el-form-item label="年龄">
+                 <el-input v-model="form.age"></el-input>
+             </el-form-item>
+             <el-form-item label="个人备注">
+                 <el-input type="textarea" v-model="form.remark"></el-input>
+             </el-form-item>
+<div style="width: 100%;height: 5px;background: #e5e5e5;margin-bottom: 5px"></div>
+             <el-form-item label="宠物名">
+                 <el-input v-model="form.petname"></el-input>
+             </el-form-item>
+             <el-form-item label="宠物年龄">
+                 <el-input v-model="form.petage"></el-input>
+             </el-form-item>
+             <el-form-item label="宠物品种">
+                 <el-input v-model="form.pettype"></el-input>
+             </el-form-item>
+             <el-form-item label="宠物描述">
+                 <el-input type="textarea" v-model="form.petdes"></el-input>
+             </el-form-item>
+             <el-form-item>
+                 <el-button @click="submitEdit" type="primary">保存</el-button>
+                 <el-button @click="open = false">取消</el-button>
+             </el-form-item>
+         </el-form>
+     </el-dialog>
+
+     <el-dialog :title="title" :visible.sync="openMsg" width="50%">
+         <el-form :model="form" :rules="rules" label-width="160px" ref="form">
+
+
+             <el-form-item label="消息" prop="content">
+                 <el-input type="textarea" disabled="" v-model="form.content"></el-input>
+             </el-form-item>
+             <el-form-item label="请输入你要回复的内容" prop="rescontent">
+                 <el-input type="textarea"  v-model="form.rescontent"></el-input>
+             </el-form-item>
+             <el-form-item>
+                 <el-button @click="submitSend" type="primary">发送</el-button>
+                 <el-button @click="openMsg = false">取消</el-button>
+             </el-form-item>
+         </el-form>
+     </el-dialog>
+
+     <el-dialog :title="title" :visible.sync="evaluteOpen" width="50%">
+         <el-form :model="form" :rules="rules" label-width="160px" ref="form">
+
+             <el-form-item label="填写你的评价" prop="content">
+                 <el-input type="textarea"  v-model="form.content"></el-input>
+             </el-form-item>
+
+             <el-form-item>
+                 <el-button @click="handleEvaluteSubmit" type="primary">确定评价</el-button>
+                 <el-button @click="evaluteOpen = false">取消</el-button>
+             </el-form-item>
+         </el-form>
+     </el-dialog>
+ </div>
+ <script src="/static/webSite/js/jquery-1.11.0.min.js"></script>
+ <script src="/static/hAdmin/js/plugins/sweetalert/sweetalert.min.js"></script>
+
+ <script src="/static/webSite/js/swiper-bundle.js"></script>
+ <script crossorigin="anonymous"
+         integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"
+ <script src="/static/webSite/js/plugins.js"></script>
+ <script src="/static/webSite/js/script.js"></script>
+ <script src="/static/hAdmin/js/plugins/toastr/toastr.min.js"></script>
+ <script src="/static/js/GloJs.js"></script>
+ <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+
+ <script>
+
+     new Vue({
+         el: "#app",
+         data() {
+             return {
+                 baseUrl: gloRequestUrl,
+                 dataList: [],
+                 orderList: [],
+                 msgList: [],
+                 selectList: [],
+                 likeList: [],
+                 fileList: [],
+                 fileStr: [],
+                 userInfo: {},
+                 total: 0,
+                 searchKey: "",
+                 activeName: "first",
+                 loading: true,
+                 userId: localStorage.getItem("userId"),
+                 role: localStorage.getItem("role"),
+                 form: {},
+                 open: false,
+                 openMsg: false,
+                 openDetail: false,
+                 evaluteOpen: false,
+                 queryParams: {
+                     pageSize: 3,
+                     pageNum: 1,
+                 },
+                 title: "",
+                 rules: {
+                     title: [
+                         {required: true, message: '请输入', trigger: 'blur'},
+
+                     ],
+
+                 }
+             }
+         },
+         methods: {
+             handleResetQuery() {
+                 this.queryParams = {
+                     pageSize: 3,
+                     pageNum: 1,
+                 }
+                 this.getList()
+             },
+
+             handleClick(tab){
+                 let that = this
+                 console.log(tab.$props.name)
+                 if(tab.$props.name === 'first'){
+                     that.getUserInfo()
+                 }else if (tab.$props.name === 'second'){
+                     that.getlikeList()
+                 }
+             },
+             // 获取列表
+             getOrderList() {
+                 let that = this;
+                 that.loading = true
+                 $.ajax({
+                     url: that.baseUrl + "/order",
+                     type: "GET",
+                     data: {
+                         pageNum:1,
+                         pageSize:1000,
+                         userid:that.userId,
+                     },
+                     success: function (data) {
+                         if (data.code !== 500) {
+                             that.loading = false
+                             that.orderList = data.list
+
+                         }
+                     },
+                     error: function () {
+                         windowsAuto(500, "服务器异常！network error！")
+                     }
+                 });
+             },
+             // 获取列表
+             getMsgList() {
+                 let that = this;
+                 that.loading = true
+                 $.ajax({
+                     url: that.baseUrl + "/message",
+                     type: "GET",
+                     data: {
+                         pageNum:1,
+                         pageSize:1000,
+                         receiveid:that.userId,
+                     },
+                     success: function (data) {
+                         if (data.code !== 500) {
+                             that.loading = false
+                             that.msgList = data.list
+
+                         }
+                     },
+                     error: function () {
+                         windowsAuto(500, "服务器异常！network error！")
+                     }
+                 });
+             },
+             submitSend() {
+                 let that = this
+                 this.$refs['form'].validate((valid) => {
+                     if (valid) {
+
+                         let updateParam = {
+                             id:  that.form.id,
+                             status:  "1"
+                         }
+                         let newParam ={
+                             senderid : that.userId,
+                             receiveid : that.form.senderid,
+                             content : that.form.rescontent,
+                             status : "0",
+                         }
+
+
+                         $.ajax({
+                             url: that.baseUrl + "/message",
+                             type: "post",
+                             data: JSON.stringify(newParam),
+                             contentType: "application/json",
+                             // headers: { 'Content-Type': 'application/json;charset=utf-8' },
+                             success: function (data) {
+                                 $.ajax({
+                                     url: that.baseUrl + "/message",
+                                     type: "PUT",
+                                     data: JSON.stringify(updateParam),
+                                     contentType: "application/json",
+                                     // headers: { 'Content-Type': 'application/json;charset=utf-8' },
+                                     success: function (data) {
+                                         that.openMsg = false
+                                         if (data.code === 200) {
+                                             toastr.success(data.msg, '提示')
+                                         } else {
+                                             toastr.error(data.msg, '提示')
+                                         }
+                                         that.getMsgList()
+                                     },
+                                     error: function () {
+                                         alert("服务器异常！network error！")
+                                     }
+                                 })
+
+                             },
+                             error: function () {
+                                 alert("服务器异常！network error！")
+                             }
+                         })
+
+
+
+
+
+
+                     }
+                 })
+             },
+             getUserInfo(){
+                 let that = this
+                 $.ajax({
+                     url: that.baseUrl + "/sysuser/detail",
+                     type: "GET",
+                     data: {id:that.userId},
+                     success: function (data) {
+                         if (data.code !== 500) {
+
+                             that.userInfo = data.Data
+
+                         }
+                     },
+                     error: function () {
+                         windowsAuto(500, "服务器异常！network error！")
+                     }
+                 });
+             },
+             // 获取列表
+             getlikeList() {
+                 let that = this;
+                 that.loading = true
+                 $.ajax({
+                     url: that.baseUrl + "/userlike",
+                     type: "GET",
+                     data: {
+                         pageNum:1,
+                         pageSize:999,
+                         userid:that.userId
+                     },
+                     success: function (data) {
+                         if (data.code !== 500) {
+                             that.loading = false
+                             that.likeList = data.list
+                             that.total = data.total
+                         }
+                     },
+                     error: function () {
+                         windowsAuto(500, "服务器异常！network error！")
+                     }
+                 });
+             },
+             submitEdit() {
+                 let that = this
+                 this.$refs['form'].validate((valid) => {
+                     if (valid) {
+                         if (that.fileStr && that.fileStr.length > 0) {
+                             that.form.img = that.fileStr.join(",")
+                         }
+                             $.ajax({
+                                 url: that.baseUrl + "/sysuser",
+                                 type: "PUT",
+                                 data: JSON.stringify(that.form),
+                                 contentType: "application/json",
+                                 // headers: { 'Content-Type': 'application/json;charset=utf-8' },
+                                 success: function (data) {
+                                     that.open = false
+                                     if (data.code === 200) {
+                                         toastr.success(data.msg, '提示')
+
+                                     } else {
+
+                                         toastr.error(data.msg, '提示')
+                                     }
+                                     that.getList()
+                                 },
+                                 error: function () {
+                                     alert("服务器异常！network error！")
+                                 }
+                             })
+                     }
+                 })
+             },
+             reset() {
+                 this.form = {}
+                 this.fileStr = []
+                 this.fileList = []
+             },
+             //打开详情
+             handleDetail(row) {
+                 let that = this;
+                 that.form = row
+                 that.title = "详情"
+                 that.openDetail = true
+
+             },
+             handleDel(id) {
+                 let that = this;
+                 swal({
+                     title: "您确定要取消吗",
+                     text: "取消后不可恢复！",
+                     type: "warning",
+                     showCancelButton: true,
+                     confirmButtonColor: "#DD6B55",
+                     confirmButtonText: "取消",
+                     cancelButtonText: "我再想想",
+                     closeOnConfirm: false
+                 }, function () {
+                     $.ajax({
+                         url: that.baseUrl + "/userlike",
+                         type: "DELETE",
+                         data: {
+                             id: id,
+                         },
+                         success: function (data) {
+                             windowsAuto(data.code, data.msg)
+                             that.getlikeList()
+                         },
+                         error: function () {
+                             alert("服务器异常！network error！")
+                         }
+                     })
+
+                 });
+             },
+             handleDelOrder(id) {
+                 let that = this;
+                 swal({
+                     title: "您确定要取消订单吗",
+                     text: "取消后不可恢复！",
+                     type: "warning",
+                     showCancelButton: true,
+                     confirmButtonColor: "#DD6B55",
+                     confirmButtonText: "取消",
+                     cancelButtonText: "我再想想",
+                     closeOnConfirm: false
+                 }, function () {
+                     $.ajax({
+                         url: that.baseUrl + "/order",
+                         type: "DELETE",
+                         data: {
+                             id: id,
+                         },
+                         success: function (data) {
+                             windowsAuto(data.code, data.msg)
+                             that.getOrderList()
+                         },
+                         error: function () {
+                             alert("服务器异常！network error！")
+                         }
+                     })
+
+                 });
+             },
+             handleEditUserInfo() {
+                 let that = this
+                 that.form = that.userInfo
+                 that.open = true
+                 that.title = "编辑"
+             },
+             handleEdit(row) {
+                 let that = this
+                 that.form = row
+                 that.openMsg = true
+                 that.title = "回复"
+             },
+
+
+             removeElement(arr, elem) {
+                 return arr.filter(item => item !== elem);
+             },
+             handleRemove(file, fileList) {
+                 this.fileStr = this.removeElement(this.fileStr, file.response.msg)
+             },
+
+             beforeRemove(file, fileList) {
+                 return this.$confirm(`确定移除 ${file.name}？`);
+             },
+             handleFileSuccess(res) {
+                 let that = this
+                 that.fileStr.push(res.msg)
+             },
+             handleLogout(){
+                 let that = this
+                 $.ajax({
+                     url: that.baseUrl + "/admin/logout",
+                     type: "get",
+                     data: {
+
+                     },
+                     success: function (data) {
+
+                         localStorage.removeItem("userId")
+                         window.location.href = that.baseUrl + "/login"
+
+
+                     },
+                     error: function () {
+                         alert("服务器异常！network error！")
+                     }
+                 })
+             },
+             handleEvalute(row){
+                 let that = this
+                 that.evaluteOpen = true
+                 that.title = "评价"
+                 that.form = JSON.parse(JSON.stringify(row))
+             },
+             handleEvaluteSubmit(){
+                 let that = this
+                 $.ajax({
+                     url: that.baseUrl + "/orderEvalute",
+                     type: "post",
+                     data: {
+                         orderid: that.form.id,
+                         content: that.form.content,
+                         userid: that.userId,
+                         companyid: that.form.companyid,
+                     },
+                     success: function (data) {
+                         windowsAuto(data.code, data.msg)
+                         that.getOrderList()
+                         that.evaluteOpen = false
+                     },
+                     error: function () {
+                         alert("服务器异常！network error！")
+                     }
+                 })
+             },
+         },
+         watch: {},
+         mounted() {
+             let that = this;
+             that.getUserInfo()
+             that.getOrderList()
+             that.getMsgList()
+             let activeName = new URLSearchParams(window.location.search).get('activeName')
+             if (activeName){
+                 that.activeName = activeName
+
+             }
+         }
+     })
+
+ </script>
+</body>
+
+</html>

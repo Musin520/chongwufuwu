@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zxx">
+
+<!-- Head -->
+
+<head>
+
+    <title>宠物服务订购平台</title>
+
+    <!-- Meta-Tags -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link href="/static/hAdmin/css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
+    <link href="/static/hAdmin/css/font-awesome.css?v=4.4.0" rel="stylesheet">
+    <link href="/static/hAdmin/css/plugins/toastr/toastr.min.css" rel="stylesheet">
+    <link href="/static/hAdmin/css/animate.css" rel="stylesheet">
+    <!-- style CSS -->
+    <link rel="stylesheet" href="/static/login/css/style.css" type="text/css" media="all">
+    <!-- google fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<!-- //Head -->
+
+<!-- Body -->
+
+<body>
+<span id="gloUrl" style="display: none"></span>
+
+    <section class="main">
+        <div class="logo text-center">
+            <h1> <a href="/web/userindex"> 宠物服务订购平台</a></h1>
+        </div>
+        <div class="content-w3ls text-center">
+            <img src="/static/login/images/admin.png" alt="" class="img-responsive">
+
+                <div class="wthree-field">
+                    <input name="text1" id="account" type="text" value="" placeholder="用户名" required>
+                </div>
+                <div class="wthree-field">
+                    <input name="password" id="password" type="Password" placeholder="密码">
+                </div>
+                <div class="wthree-field">
+                    <button type="button" id="login" class="btn">点击登录</button>
+                </div>
+                <div class="login-bottom">
+                    <a href="/web/register" id="register" class="">创建新账号</a>
+                </div>
+
+        </div>
+        <div class="copyright">
+            <p>xxx | <a href="javascript:void(0)" title="宠物服务订购平台">宠物服务订购平台</a></p>
+        </div>
+    </section>
+
+</body>
+<script src="/static/hAdmin/js/jquery.min.js?v=2.1.4"></script>
+
+<script src="/static/hAdmin/js/bootstrap.min.js?v=3.3.6"></script>
+
+
+
+<script src="/static/js/GloJs.js"></script>
+<!-- //Body -->
+<script src="/static/hAdmin/js/plugins/toastr/toastr.min.js"></script>
+<script>
+    //$(function(){ }实际上是匿名函数。这是JQuery的语法，$表示JQuery对象
+
+    $(function (){
+        let Glo_BaseUrl = $("#gloUrl").attr("gloUValue")
+
+        //登录
+        $("#login").click(function (){//点击事件
+            // console.log(Glo_BaseUrl)//输出普通信息
+            if ($("#account").val() !== ""){
+                $.ajax({
+                    //Glo_BaseUrl 公共的部分
+                    url: Glo_BaseUrl + "/toLogin",
+                    //更新添加数据库
+                    type: "post",
+                    data: {
+                        //向后端传的参数
+                        "account":$("#account").val(),
+                        "password":$("#password").val(),
+                    },
+                    success: function (data) {//后端返回的数据
+                        if (data.code === 200){
+                            //setItem(“key”,“value”)：存储名字为key的一个值value，如果key存在，就更新value
+                            //getItem(“key”)：获取名称为key的值，如果key不存在则返回null**
+                            localStorage.setItem("userId",data.data.userId)
+                            localStorage.setItem("role",data.data.role)
+                            toastr.success(data.message, '登陆成功！正在前往主页......')
+                            if (data.data.role === "1"){
+                                setTimeout(function (){
+                                    window.location.href = Glo_BaseUrl + "/web/index"
+                                },1000)
+                            }else if (data.data.role === "2"){
+                                setTimeout(function (){
+                                    window.location.href = Glo_BaseUrl + "/web/userindex"
+                                },1000)
+                            }else if (data.data.role === "3"){
+                                setTimeout(function (){
+                                    window.location.href = Glo_BaseUrl + "/web/index"
+                                },1000)
+                            }
+                        }else {
+                            toastr.error(data.message, '登陆失败！')
+                        }
+                    },
+                    error: function () {
+                        alert("服务器异常！network error！")
+                    }
+                })
+            }else {
+                toastr.error("用户名为空", '登陆失败！')
+                //消息提示（toastr.options 配置提示框,通过自定义配置，达到不同的效果）
+            }
+        })
+        //前往注册界面
+        $("#register").click(function (){
+            window.location.href = Glo_BaseUrl + "/web/register"
+        })
+    })
+
+
+
+</script>
+</html>

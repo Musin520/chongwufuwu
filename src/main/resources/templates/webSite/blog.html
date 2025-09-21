@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>资讯</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="author" content="">
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+    <script src="/static/DemoBootStrap/js/vue.js"></script>
+
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.3.0-alpha3/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="/static/webSite/css/vendor.css">
+    <link rel="stylesheet" type="text/css" href="/static/webSite/style.css">
+    <link href="/static/hAdmin/css/plugins/sweetalert/sweetalert.css" rel="stylesheet">
+    <link href="/static/hAdmin/css/font-awesome.css?v=4.4.0" rel="stylesheet">
+
+  </head>
+  <body>
+
+<div id="app">
+
+  <div class="preloader-wrapper">
+    <div class="preloader">
+    </div>
+  </div>
+
+  <header>
+    <div class="container-fluid">
+      <div class="row py-3 border-bottom">
+
+        <div class="col-sm-4 col-lg-2 text-center text-sm-start d-flex gap-3 justify-content-center justify-content-md-start">
+          <div class="d-flex align-items-center my-3 my-sm-0">
+            <a href="/web/userindex">
+              <img src="/static/webSite/images/logo.png" style="width: 50px;height: 50px;" alt="logo" class="img-fluid">
+            </a>
+          </div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar"
+                  aria-controls="offcanvasNavbar">
+            <svg width="24" height="24" viewBox="0 0 24 24"><use xlink:href="#menu"></use></svg>
+          </button>
+        </div>
+
+        <div class="col-md-2 ">
+          <div class="search-bar row bg-light p-2 rounded-4">
+
+            <div class="col-11 col-md-10" style="text-align: center">
+              宠物服务订购平台
+            </div>
+
+          </div>
+        </div>
+
+        <div class="col-md-8">
+          <ul class="navbar-nav list-unstyled d-flex flex-row gap-3 gap-lg-5 justify-content-center flex-wrap align-items-center mb-0 fw-bold text-uppercase text-dark">
+            <li class="nav-item ">
+              <a href="/web/userindex" class="nav-link">主页</a>
+            </li>
+
+            <li class="nav-item">
+              <a href="/web/userproductlist"  class="nav-link  ">宠物服务列表</a>
+            </li>
+            <li class="nav-item">
+              <a href="/web/usercart"  class="nav-link ">购物车</a>
+            </li>
+            <li class="nav-item ">
+              <a href="/web/usercontact"  class="nav-link ">联系我们</a>
+            </li>
+            <li class="nav-item text-primary">
+              <a href="/web/userblog"  class="nav-link ">网站资讯/公告</a>
+            </li>
+            <li class="nav-item">
+              <a href="/web/personal"  class="nav-link " title="个人中心"><i class="fa fa-user"></i></a>
+            </li>
+          </ul>
+        </div>
+
+
+
+      </div>
+    </div>
+  </header>
+    <section class="jarallax py-5">
+      <img src="/static/webSite/images/banner-1.jpg" class="jarallax-img">
+      <div class="hero-content py-0 py-md-5">
+        <div class="container-lg d-flex flex-column d-md-block align-items-center">
+          <nav class="breadcrumb">
+            <a class="breadcrumb-item nav-link" href="/web/userindex">主业</a>
+
+            <span class="breadcrumb-item active" aria-current="page">公告</span>
+          </nav>
+          <h1>网站公告</h1>
+        </div>
+      </div>
+    </section>
+
+    <div class="py-5">
+      <div class="container-lg">
+        <div class="row">
+          <div class="col-md-4" v-for="item in dataList">
+            <article class="post-item card border-0 shadow-sm p-3">
+              <div class="image-holder zoom-effect">
+                <a href="#">
+                  <img :src="item.img" style="width: 469px;height: 426px;" alt="post" class="card-img-top">
+                </a>
+              </div>
+              <div class="card-body">
+                <div class="post-meta d-flex text-uppercase gap-3 my-2 align-items-center">
+                  <div class="meta-date"><i class="fa fa-calendar"></i>
+                    {{item.createTime}}</div>
+                  <div class="meta-categories">
+                更新时间：    {{item.updateTime}}</div>
+                </div>
+                <div class="post-header">
+                  <h3 class="post-title">
+                    <a href="#" class="text-decoration-none">{{item.title}}</a>
+                  </h3>
+                  <p>{{item.content}}</p>
+                </div>
+              </div>
+            </article>
+          </div>
+
+        </div>
+
+
+      </div>
+    </div>
+
+  <section class="py-5">
+    <div class="container-lg">
+      <div class="row row-cols-1 row-cols-sm-3 row-cols-lg-5">
+        <div class="col">
+          <div class="card mb-3 border border-dark-subtle p-3">
+            <div class="text-dark mb-3">
+              <i class="fa fa-battery-4"></i>
+            </div>
+            <div class="card-body p-0">
+              <h5>宠物服务保证</h5>
+              <p class="card-text">渠道正规，审核合格.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="card mb-3 border border-dark-subtle p-3">
+            <div class="text-dark mb-3">
+              <i class="fa fa-bell"></i>              </div>
+            <div class="card-body p-0">
+              <h5>100% 真实</h5>
+              <p class="card-text">活动与折扣真实有效.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="card mb-3 border border-dark-subtle p-3">
+            <div class="text-dark mb-3">
+              <i class="fa fa-shopping-cart"></i>
+            </div>
+            <div class="card-body p-0">
+              <h5>购物车一件选购</h5>
+              <p class="card-text">灵活自如，快捷下单.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="card mb-3 border border-dark-subtle p-3">
+            <div class="text-dark mb-3">
+              <i class="fa fa-bar-chart"></i>
+            </div>
+            <div class="card-body p-0">
+              <h5>遇到问题请留言</h5>
+              <p class="card-text">后台全天回复.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col">
+          <div class="card mb-3 border border-dark-subtle p-3">
+            <div class="text-dark mb-3">
+              <i class="fa fa-user"></i>
+            </div>
+            <div class="card-body p-0">
+              <h5>个性展示</h5>
+              <p class="card-text">更改个人信息，彰显个性.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="pb-4 my-4">
+    <div class="container-lg" >
+
+      <div class="bg-warning pt-5 rounded-5" >
+        <div class="container" style="background-image: url('/static/webSite/images/bottomBanner.jpg')">
+          <div class="row justify-content-center align-items-center">
+            <div class="col-md-4">
+              <h2 class="mt-5">加入购物车进行购买</h2>
+              <p>如果遇到问题，请联系我们留言</p>
+              <div class="d-flex gap-2 flex-wrap mb-5">
+                <a class="btn btn-danger" href="/web/usercart" title="前往购物车">前往购物车 <i class="fa fa-shopping-cart"></i></a>
+                <a class="btn btn-primary" href="/web/personal?activeName=third" title="前往订单">前往订单 <i class="fa fa-list"></i></a>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+  <div id="footer-bottom">
+    <div class="container-lg">
+      <div class="row">
+        <div class="col-md-6 copyright">
+          <p>@  2024 - 宠物服务订购平台.</p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+<script src="/static/webSite/js/jquery-1.11.0.min.js"></script>
+<script src="/static/webSite/js/plugins.js"></script>
+<script src="/static/webSite/js/script.js"></script>
+<script src="/static/js/GloJs.js"></script>
+  <script>
+
+    new Vue({
+      el: "#app",
+      data() {
+        return {
+          baseUrl: gloRequestUrl,
+          dataList: [],
+          producttypeList: [],
+          fileList: [],
+          fileStr: [],
+          total: 0,
+          searchKey: "",
+          loading: true,
+          userId: localStorage.getItem("userId"),
+          role: localStorage.getItem("role"),
+          form: {},
+          open: false,
+          openDetail: false,
+          queryParams: {
+            pageSize: 999,
+            pageNum: 1,
+          },
+          title: "",
+          rules: {
+            title: [
+              {required: true, message: '请输入', trigger: 'blur'},
+
+            ],
+
+          }
+        }
+      },
+      methods: {
+
+        getproductTypeList() {
+          let that = this;
+          let param = {
+            "pageSize": 999,
+            "pageNum": that.queryParams.pageNum,
+
+          }
+          $.ajax({
+            url: that.baseUrl + "/producttype",
+            type: "GET",
+            data: param,
+            success: function (data) {
+              if (data.code !== 500) {
+
+                that.producttypeList = data.list
+
+              }
+            },
+            error: function () {
+              windowsAuto(500, "服务器异常！network error！")
+            }
+          });
+        },
+        // 获取列表
+        getList() {
+          let that = this;
+          that.loading = true
+          $.ajax({
+            url: that.baseUrl + "/webnotice/list",
+            type: "GET",
+            data: that.queryParams,
+            success: function (data) {
+              if (data.code !== 500) {
+                that.loading = false
+                that.dataList = data.list
+                that.total = data.total
+              }
+            },
+            error: function () {
+              windowsAuto(500, "服务器异常！network error！")
+            }
+          });
+        },
+
+        handleDel(id) {
+          let that = this;
+          swal({
+            title: "您确定要删除该信息吗",
+            text: "删除后不可恢复！",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "删除",
+            cancelButtonText: "我再想想",
+            closeOnConfirm: false
+          }, function () {
+            $.ajax({
+              url: that.baseUrl + "/webnotice/del",
+              type: "DELETE",
+              data: {
+                id: id,
+              },
+              success: function (data) {
+                windowsAuto(data.code, data.msg)
+                that.getList()
+              },
+              error: function () {
+                alert("服务器异常！network error！")
+              }
+            })
+
+          });
+        },
+
+
+      },
+      watch: {},
+      mounted() {
+        let that = this;
+        // that.getproductTypeList()
+        that.getList()
+
+      }
+    })
+
+  </script>
+  </body>
+</html>

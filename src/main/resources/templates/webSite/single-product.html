@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>详情</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="author" content="">
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+    <link rel="stylesheet" href="/static/webSite/css/swiper-bundle.min.css">
+    <script src="/static/DemoBootStrap/js/vue.js"></script>
+
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.3.0-alpha3/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="/static/webSite/css/vendor.css">
+    <link rel="stylesheet" type="text/css" href="/static/webSite/style.css">
+    <link href="/static/hAdmin/css/font-awesome.css?v=4.4.0" rel="stylesheet">
+
+    <link href="/static/hAdmin/css/plugins/toastr/toastr.min.css" rel="stylesheet">
+    <link href="/static/element/element.css" rel="stylesheet">
+
+
+  </head>
+  <body>
+  <div id="app">
+
+    <header>
+
+      <div class="container-fluid">
+        <div class="row py-3 border-bottom">
+
+          <div class="col-sm-4 col-lg-2 text-center text-sm-start d-flex gap-3 justify-content-center justify-content-md-start">
+            <div class="d-flex align-items-center my-3 my-sm-0">
+              <a href="/web/userindex">
+                <img src="/static/webSite/images/logo.png" style="width: 50px;height: 50px;" alt="logo" class="img-fluid">
+              </a>
+            </div>
+            <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar"
+                    aria-controls="offcanvasNavbar">
+              <svg width="24" height="24" viewBox="0 0 24 24"><use xlink:href="#menu"></use></svg>
+            </button>
+          </div>
+
+          <div class="col-md-2 ">
+            <div class="search-bar row bg-light p-2 rounded-4">
+
+              <div class="col-11 col-md-10" style="text-align: center">
+                宠物服务订购平台
+              </div>
+
+            </div>
+          </div>
+
+          <div class="col-md-8">
+            <ul class="navbar-nav list-unstyled d-flex flex-row gap-3 gap-lg-5 justify-content-center flex-wrap align-items-center mb-0 fw-bold text-uppercase text-dark">
+              <li class="nav-item ">
+                <a href="/web/userindex" class="nav-link">主页</a>
+              </li>
+
+              <li class="nav-item">
+                <a href="/web/userproductlist"  class="nav-link  ">宠物服务列表</a>
+              </li>
+              <li class="nav-item ">
+                <a href="/web/usercart"  class="nav-link ">购物车</a>
+              </li>
+              <li class="nav-item">
+                <a href="/web/usercontact"  class="nav-link ">联系我们</a>
+              </li>
+              <li class="nav-item">
+                <a href="/web/userblog"  class="nav-link ">网站资讯/公告</a>
+              </li>
+              <li class="nav-item">
+                <a href="/web/personal"  class="nav-link " title="个人中心"><i class="fa fa-user"></i></a>
+              </li>
+            </ul>
+          </div>
+
+
+
+        </div>
+      </div>
+    </header>
+    <section class="jarallax py-5">
+      <img src="/static/webSite/images/banner-1.jpg" class="jarallax-img">
+      <div class="hero-content py-0 py-md-5">
+        <div class="container-lg d-flex flex-column d-md-block align-items-center">
+          <nav class="breadcrumb">
+            <a class="breadcrumb-item nav-link" href="/static/webindex">主页</a>
+            <span  class="breadcrumb-item active" aria-current="page">宠物服务详情</span>
+          </nav>
+          <h1 style="color: whitesmoke">宠物服务详情</h1>
+        </div>
+      </div>
+    </section>
+    <section id="selling-product" class="single-product mt-0 mt-md-5">
+      <div class="container-lg">
+        <nav class="breadcrumb">
+          <a class="breadcrumb-item" href="/web/userindex">主页</a>
+          <span class="breadcrumb-item active" aria-current="page">宠物服务详情</span>
+        </nav>
+        <div class="row g-5">
+          <div class="col-lg-7">
+            <div class="row flex-column-reverse flex-lg-row">
+              <div class="col-md-12 col-lg-2">
+                <!-- product-thumbnail-slider -->
+                <div class="swiper product-thumbnail-slider">
+                  <div class="swiper-wrapper">
+                    <div class="swiper-slide" v-for="item in productInfo.detailImgList" @click="currentImg(item)">
+                      <img :src="item" alt="" style="width: 120px;height: 120px;" class="thumb-image img-fluid">
+                    </div>
+
+                  </div>
+                </div>
+                <!-- / product-thumbnail-slider -->
+              </div>
+              <div class="col-md-12 col-lg-10">
+                <!-- product-large-slider -->
+                <div class="swiper product-large-slider">
+                  <div class="swiper-wrapper">
+
+                    <div class="swiper-slide" >
+                      <div class="image-zoom" v-if="productInfo" data-scale="2.5" :data-image="currentImgInfo">
+
+                        <img
+                                v-if="currentImgInfo"
+                          :src="currentImgInfo" alt="product-large" class="img-fluid">
+                      </div>
+                    </div>
+
+                  </div>
+                  <div class="swiper-pagination"></div>
+                </div>
+                <!-- / product-large-slider -->
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-5">
+            <div class="product-info">
+              <div class="element-header">
+                <h2 itemprop="name">{{productInfo.productname}}</h2>
+                <div class="rating-container d-flex gap-0 align-items-center">
+
+                  <span class="rating-count">折扣： <strong style="color: red"> {{productInfo.spare2}}</strong>  折</span>
+                </div>
+              </div>
+              <div class="product-price pt-3 pb-3">
+                <strong class="text-primary display-6 fw-bold">￥{{(parseFloat(productInfo.kedanjia) * parseFloat(productInfo.spare2) / 10).toFixed(2) }}</strong>
+                <del class="ms-2">￥{{productInfo.kedanjia}}</del>
+              </div>
+
+              <div class="cart-wrap py-4">
+                <div class="color-options pb-3">
+                  <div class="color-toggle" data-option-index="0">
+                    <h6 class="item-title text-uppercase text-dark">服务质量:</h6>
+
+                    <input type="radio" class="btn-check" name="options-color" id="option5" autocomplete="off" checked>
+                    <label class="btn" for="option5">{{productInfo.guige}}</label>
+
+                  </div>
+                </div>
+                <div class="swatch" data-option-index="1">
+                  <h6 class="item-title text-uppercase text-dark">当日可约数量:</h6>
+                    <input type="radio" class="btn-check" name="options-size" id="option9" autocomplete="off" checked>
+                    <label class="btn" for="option9">{{productInfo.kucun}}</label>
+
+                </div>
+                <div class="product-quantity pt-3">
+                  <div class="stock-number text-dark"><em>数量</em></div>
+                  <div class="stock-button-wrap">
+
+                    <div class="input-group product-qty" style="max-width: 150px;">
+
+                      <el-form :model="form" >
+                        <el-form-item prop="number">
+
+                          <el-input-number v-model="form.number"  :min="1" :max="10" label="数量"></el-input-number>
+                        </el-form-item>
+                      </el-form>
+
+
+                    </div>
+                    <div class="qty-button d-flex flex-wrap pt-3">
+                      <button type="submit"  @click="handleAddCart" name="add-to-cart" value="1269" class="btn btn-dark py-3 px-4 text-uppercase mt-3">+ 购物车</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="meta-product py-2">
+                <div class="meta-item d-flex align-items-baseline">
+                  <h6 class="item-title no-margin pe-2">服务天数:</h6>
+                  <span>{{productInfo.fahuotianshu}}</span>
+                </div>
+                <div class="meta-item d-flex align-items-baseline">
+                  <h6 class="item-title no-margin pe-2">商品分类:</h6>
+                  <span>{{productInfo.typeName}}</span>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class=" products-carousel">
+      <div class="container-lg">
+        <div class="row">
+          <div>
+
+            <div class="tab-content py-4" id="v-pills-tabContent">
+              <div class="tab-pane fade show active" id="v-pills-description" role="tabpanel" aria-labelledby="v-pills-description-tab" tabindex="0">
+                <h5>宠物服务描述</h5>
+                <p>{{productInfo.productdes}}</p>
+              </div>
+
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <section id="related" class="products-carousel">
+      <div class="container-lg overflow-hidden py-5">
+        <div class="row">
+          <div class="col-md-12">
+
+            <div class="section-header d-flex flex-wrap justify-content-between my-4">
+
+              <h2 class="section-title">评论</h2>
+
+              <div class="d-flex align-items-center">
+
+                <div class="swiper-buttons">
+                  <button class="swiper-prev products-carousel-prev btn btn-primary">❮</button>
+                  <button class="swiper-next products-carousel-next btn btn-primary">❯</button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12">
+
+            <div class="swiper">
+              <div class="swiper-wrapper">
+                <div v-for="item in dataList" class="col-lg-6 d-flex flex-wrap gap-3 swiper-slide">
+                  <div class="col-md-2">
+                    <div class="image-holder">
+                      <img :src="item.sysuser.img" alt="review" class="img-fluid rounded-circle">
+                    </div>
+                  </div>
+                  <div class="col-md-8">
+                    <div class="review-content">
+                      <div class="rating-container d-flex align-items-center">
+                          <span class="rating me-2">
+                            <svg width="24" height="24" class="text-warning"><use xlink:href="#star-full"></use></svg>
+                            <svg width="24" height="24" class="text-warning"><use xlink:href="#star-full"></use></svg>
+                            <svg width="24" height="24" class="text-warning"><use xlink:href="#star-full"></use></svg>
+                            <svg width="24" height="24" class="text-warning"><use xlink:href="#star-full"></use></svg>
+                            <svg width="24" height="24" class="text-warning"><use xlink:href="#star-half"></use></svg>
+                          </span>
+
+                      </div>
+                      <span >{{item.sysuser.username}}</span>
+                      <div class="review-header">
+                        <span class="review-date">{{item.createtime}}</span>
+                      </div>
+                      <p>{{item.content}}</p>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+            <!-- / products-carousel -->
+
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+
+
+
+
+
+    <section class="pb-4 my-4">
+      <div class="container-lg" >
+
+        <div class="bg-warning pt-5 rounded-5" >
+          <div class="container" style="background-image: url('/static/webSite/images/bottomBanner.jpg')">
+            <div class="row justify-content-center align-items-center">
+              <div class="col-md-4">
+                <h2 class="mt-5">加入购物车进行购买</h2>
+                <p>如果遇到问题，请联系我们留言</p>
+                <div class="d-flex gap-2 flex-wrap mb-5">
+                  <a class="btn btn-danger" href="/web/usercart" title="前往购物车">前往购物车 <i class="fa fa-shopping-cart"></i></a>
+                  <a class="btn btn-primary" href="/web/personal?activeName=third" title="前往订单">前往订单 <i class="fa fa-list"></i></a>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+    <section class="py-5">
+      <div class="container-lg">
+        <div class="row row-cols-1 row-cols-sm-3 row-cols-lg-5">
+          <div class="col">
+            <div class="card mb-3 border border-dark-subtle p-3">
+              <div class="text-dark mb-3">
+                <i class="fa fa-battery-4"></i>
+              </div>
+              <div class="card-body p-0">
+                <h5>宠物服务保证</h5>
+                <p class="card-text">渠道正规，审核合格.</p>
+              </div>
+            </div>
+          </div>
+          <div class="col">
+            <div class="card mb-3 border border-dark-subtle p-3">
+              <div class="text-dark mb-3">
+                <i class="fa fa-bell"></i>              </div>
+              <div class="card-body p-0">
+                <h5>100% 真实</h5>
+                <p class="card-text">活动与折扣真实有效.</p>
+              </div>
+            </div>
+          </div>
+          <div class="col">
+            <div class="card mb-3 border border-dark-subtle p-3">
+              <div class="text-dark mb-3">
+                <i class="fa fa-shopping-cart"></i>
+              </div>
+              <div class="card-body p-0">
+                <h5>购物车一件选购</h5>
+                <p class="card-text">灵活自如，快捷下单.</p>
+              </div>
+            </div>
+          </div>
+          <div class="col">
+            <div class="card mb-3 border border-dark-subtle p-3">
+              <div class="text-dark mb-3">
+                <i class="fa fa-bar-chart"></i>
+              </div>
+              <div class="card-body p-0">
+                <h5>遇到问题请留言</h5>
+                <p class="card-text">后台全天回复.</p>
+              </div>
+            </div>
+          </div>
+          <div class="col">
+            <div class="card mb-3 border border-dark-subtle p-3">
+              <div class="text-dark mb-3">
+                <i class="fa fa-user"></i>
+              </div>
+              <div class="card-body p-0">
+                <h5>个性展示</h5>
+                <p class="card-text">更改个人信息，彰显个性.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div id="footer-bottom">
+      <div class="container-lg">
+        <div class="row">
+          <div class="col-md-6 copyright">
+            <p>@  2024 - 宠物服务订购平台.</p>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+    <script src="/static/webSite/js/jquery-1.11.0.min.js"></script>
+<!--    <script src="https://cdn.bootcdn.net/ajax/libs/Swiper/9.4.1/swiper-bundle.min.js"></script>-->
+    <script src="/static/webSite/js/swiper-bundle.js"></script>
+
+
+    <script src="/static/webSite/js/plugins.js"></script>
+    <script src="/static/webSite/js/script.js"></script>
+    <script src="/static/hAdmin/js/plugins/toastr/toastr.min.js"></script>
+  <script src="/static/element/element.js"></script>
+
+    <script src="/static/js/GloJs.js"></script>
+  <script>
+
+    new Vue({
+      el: "#app",
+      data() {
+        return {
+          baseUrl: gloRequestUrl,
+          productInfo: [],
+          id: "",
+          fileList: [],
+          dataList: [],
+          fileStr: [],
+          total: 0,
+          searchKey: "",
+          loading: true,
+          userId: localStorage.getItem("userId"),
+          role: localStorage.getItem("role"),
+          form: {
+            number:1
+          },
+          currentImgInfo: "",
+          open: false,
+          openDetail: false,
+          queryParams: {
+            pageSize: 10,
+            pageNum: 1,
+          },
+          title: "",
+          rules: {
+            title: [
+              {required: true, message: '请输入', trigger: 'blur'},
+
+            ],
+
+          }
+        }
+      },
+      methods: {
+        //添加购物车
+        handleAddCart(){
+          let that = this
+          if (that.form.number === null || that.form.number === 0 || that.form.number == undefined){
+            toastr.error("数量不能为空", '提示')
+            return false
+          }
+
+          let param = {
+            productid:that.id,
+            userid:that.userId,
+            number:that.form.number,
+          }
+          $.ajax({
+            url: that.baseUrl + "/shopcart",
+            type: "post",
+            data: JSON.stringify(param),
+            contentType: "application/json",
+            // headers: { 'Content-Type': 'application/json;charset=utf-8' },
+            success: function (data) {
+              that.open = false
+              if (data.code === 200) {
+                toastr.success(data.msg, '提示')
+
+              } else {
+
+                toastr.error(data.msg, '提示')
+              }
+
+            },
+            error: function () {
+              alert("服务器异常！network error！")
+            }
+          })
+        },
+        currentImg(item){
+          this.currentImgInfo = item
+        },
+        // 获取
+        getDetail() {
+          let that = this;
+          $.ajax({
+            url: that.baseUrl + "/product/detail",
+            type: "GET",
+            data:  {
+              id:that.id
+            },
+            success: function (data) {
+              if (data.code !== 500) {
+           that.productInfo = data.Data
+                that.currentImgInfo = data.Data.detailImgList[0]
+                that.getList()
+              }
+            },
+            error: function () {
+              windowsAuto(500, "服务器异常！network error！")
+            }
+          });
+        },
+        // 获取列表
+        getList() {
+          let that = this;
+          that.loading = true
+          $.ajax({
+            url: that.baseUrl + "/orderEvalute",
+            type: "GET",
+            data: {
+              pageNum: 1,
+              pageSize: 1111,
+              companyid:that.productInfo.companyid
+            },
+            success: function (data) {
+              if (data.code !== 500) {
+                that.loading = false
+                that.dataList = data.list
+
+              }
+            },
+            error: function () {
+              windowsAuto(500, "服务器异常！network error！")
+            }
+          });
+        },
+
+
+
+      },
+      watch: {},
+      mounted() {
+        let that = this;
+
+        let id = new URLSearchParams(window.location.search).get('id')
+        if (id){
+          that.id = id
+          that.getDetail()
+
+        }
+
+      }
+    })
+
+  </script>
+  </body>
+</html>
