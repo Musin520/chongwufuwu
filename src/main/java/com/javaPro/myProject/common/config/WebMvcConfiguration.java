@@ -21,8 +21,12 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
                         "/logout",
                         "/toLogin",
                         "/toRegister",
-                        "/web/photoTemplate"
+                        "/web/photoTemplate",
+                        "/product/**",
+                        "/producttype/**",
+                        "/company/**",
+                        "/static/**"
                 )//去除对这些接口地址的拦截
-                .addPathPatterns("/web/*","/*");
+                .addPathPatterns("/web/*");
     }
 }

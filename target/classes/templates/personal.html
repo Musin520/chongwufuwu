@@ -128,6 +128,7 @@
              <div style="width: 100%;text-align: center;margin-top: 50px">
                  <el-button type="danger" v-if="role == '2'" @click="handleLogout">退出登录</el-button>
                  <el-button type="warning" @click="handleEditUserInfo">修改信息</el-button>
+                 <el-button type="primary" v-if="role == '2'" @click="goToChongzhi">充值中心</el-button>
 
              </div>
          </el-tab-pane>
@@ -171,6 +172,9 @@
                          width="350px"
                  >
                      <template slot-scope="scope">
+                         <el-button @click="viewServiceDetail(scope.row.productid)" type="primary" round size="small"><i
+                                 class="fa fa-eye"></i> 查看详情
+                         </el-button>
                          <el-button @click="handleDel(scope.row.id)" type="danger" round size="small"><i
                                  class="fa fa-close"></i> 取消收藏
                          </el-button>
@@ -188,65 +192,10 @@
                              v-loading="loading">
                          <el-table-column
                                  align="center"
-
-                                 type="expand"
-                                 prop="id"
-                         >
-                             <template slot-scope="scope">
-
-                                 <el-table v-if="scope.row.cartList" :data="scope.row.cartList">
-                                     <el-table-column
-                                             align="center"
-                                             label="图片"
-                                             prop="img"
-                                     >
-                                         <template slot-scope="scopeInner">
-                                             <el-image :src="scopeInner.row.product.img"
-                                                       style="width: 100px;height: 100px;"></el-image>
-                                         </template>
-                                     </el-table-column>
-                                     <el-table-column
-                                             align="center"
-                                             label="宠物服务名称"
-                                             prop="product.productname"
-                                     >
-
-                                     </el-table-column>
-                                     <el-table-column
-                                             align="center"
-                                             label="单价"
-                                             prop="product.kedanjia"
-                                     >
-
-                                     </el-table-column>
-                                     <el-table-column
-                                             align="center"
-                                             label="数量"
-                                             prop="number"
-                                     >
-
-                                     </el-table-column>
-
-                                     <el-table-column
-                                             align="center"
-                                             label="总价"
-
-                                     >
-                                         <template slot-scope="scopeInner">
-                                             {{parseFloat(scopeInner.row.product.kedanjia)*scopeInner.row.number}}
-                                         </template>
-                                     </el-table-column>
-
-                                 </el-table>
-                             </template>
-                         </el-table-column>
-                         <el-table-column
-                                 align="center"
-                                 label="订单id"
+                                 label="订单ID"
                                  prop="id"
                          >
 
-                         </el-table-column>
 
                          <el-table-column
                                  align="center"
@@ -284,12 +233,14 @@
                                  width="350px"
                          >
                              <template slot-scope="scope">
+                                 <el-button @click="viewOrderDetail(scope.row)" round size="small"
+                                            type="info"><i class="fa fa-eye"></i> 查看详情
+                                 </el-button>
                                  <el-button @click="handleDelOrder(scope.row.id)" round size="small"
-
                                             type="danger"><i class="fa fa-close"></i> 取消
                                  </el-button>
                                  <el-button @click="handleEvalute(scope.row)" round size="small"
-v-if="!scope.row.content"
+                                            v-if="!scope.row.content"
                                             type="primary"><i class="fa fa-edit"></i> 评价
                                  </el-button>
                              </template>
@@ -463,6 +414,60 @@ v-if="!scope.row.content"
              </el-form-item>
          </el-form>
      </el-dialog>
+
+     <!-- 订单详情弹窗 -->
+     <el-dialog title="订单详情" :visible.sync="orderDetailVisible" width="70%">
+         <div v-if="currentOrder">
+             <el-descriptions :column="3" title="订单基本信息" border>
+                 <el-descriptions-item label="订单ID">{{currentOrder.id}}</el-descriptions-item>
+                 <el-descriptions-item label="下单用户">{{currentOrder.username}}</el-descriptions-item>
+                 <el-descriptions-item label="联系方式">{{currentOrder.phonenumber}}</el-descriptions-item>
+                 <el-descriptions-item label="下单时间">{{currentOrder.createtime}}</el-descriptions-item>
+                 <el-descriptions-item label="更新时间">{{currentOrder.updatetime}}</el-descriptions-item>
+                 <el-descriptions-item label="订单状态">
+                     <el-tag type="success">已完成</el-tag>
+                 </el-descriptions-item>
+                 <el-descriptions-item label="商家备注" :span="3">{{currentOrder.remark || '无'}}</el-descriptions-item>
+                 <el-descriptions-item label="用户评价" :span="3">{{currentOrder.content || '暂无评价'}}</el-descriptions-item>
+             </el-descriptions>
+
+             <!-- 订单商品详情 -->
+             <div class="mt-4">
+                 <h5>订单商品详情</h5>
+                 <el-table :data="currentOrder.cartList" style="width: 100%" border>
+                     <el-table-column label="商品图片" width="120" align="center">
+                         <template slot-scope="scope">
+                             <el-image :src="scope.row.product.img" style="width: 80px; height: 80px;" fit="cover"></el-image>
+                         </template>
+                     </el-table-column>
+                     <el-table-column prop="product.productname" label="商品名称"></el-table-column>
+                     <el-table-column prop="product.kedanjia" label="单价" width="100" align="center">
+                         <template slot-scope="scope">
+                             ￥{{scope.row.product.kedanjia}}
+                         </template>
+                     </el-table-column>
+                     <el-table-column prop="number" label="数量" width="80" align="center"></el-table-column>
+                     <el-table-column label="小计" width="120" align="center">
+                         <template slot-scope="scope">
+                             ￥{{(parseFloat(scope.row.product.kedanjia) * scope.row.number).toFixed(2)}}
+                         </template>
+                     </el-table-column>
+                     <el-table-column label="操作" width="120" align="center">
+                         <template slot-scope="scope">
+                             <el-button @click="viewServiceDetail(scope.row.product.id)" type="text" size="small">
+                                 查看服务详情
+                             </el-button>
+                         </template>
+                     </el-table-column>
+                 </el-table>
+
+                 <!-- 订单总计 -->
+                 <div class="text-right mt-3">
+                     <strong>订单总计: ￥{{calculateOrderTotal(currentOrder.cartList)}}</strong>
+                 </div>
+             </div>
+         </div>
+     </el-dialog>
  </div>
  <script src="/static/webSite/js/jquery-1.11.0.min.js"></script>
  <script src="/static/hAdmin/js/plugins/sweetalert/sweetalert.min.js"></script>
@@ -502,6 +507,8 @@ v-if="!scope.row.content"
                  openMsg: false,
                  openDetail: false,
                  evaluteOpen: false,
+                 orderDetailVisible: false,
+                 currentOrder: null,
                  queryParams: {
                      pageSize: 3,
                      pageNum: 1,
@@ -858,6 +865,25 @@ v-if="!scope.row.content"
                          alert("服务器异常！network error！")
                      }
                  })
+             },
+             goToChongzhi() {
+                 window.location.href = "/web/chongzhi";
+             },
+             viewServiceDetail(productId) {
+                 // 跳转到服务详情页面
+                 window.location.href = "/web/usersingle?id=" + productId;
+             },
+             viewOrderDetail(order) {
+                 this.currentOrder = order;
+                 this.orderDetailVisible = true;
+             },
+             calculateOrderTotal(cartList) {
+                 if (!cartList || cartList.length === 0) return '0.00';
+                 let total = 0;
+                 cartList.forEach(item => {
+                     total += parseFloat(item.product.kedanjia) * item.number;
+                 });
+                 return total.toFixed(2);
              },
          },
          watch: {},

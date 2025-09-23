@@ -9,6 +9,7 @@
         <result property="userid" column="userid" jdbcType="INTEGER"/>
         <result property="orderid" column="orderid" jdbcType="INTEGER"/>
         <result property="companyid" column="companyid" jdbcType="INTEGER"/>
+        <result property="rating" column="rating" jdbcType="INTEGER"/>
         <association property="sysuser" javaType="com.javaPro.myProject.modules.sysuser.entity.Sysuser">
             <result property="id" column="id" jdbcType="INTEGER"/>
             <result property="username" column="username" jdbcType="VARCHAR"/>

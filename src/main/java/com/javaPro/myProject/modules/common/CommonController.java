@@ -2,14 +2,12 @@ package com.javaPro.myProject.modules.common;
 
 import com.javaPro.myProject.common.controller.BaseController;
 import com.javaPro.myProject.common.model.AjaxResult;
-import com.javaPro.myProject.common.model.ListByPage;
-import com.javaPro.myProject.modules.type.entity.TType;
+import com.javaPro.myProject.service.FileUploadService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-
-import javax.annotation.Resource;
 
 /**
  * 文件控制层
@@ -18,20 +16,25 @@ import javax.annotation.Resource;
 @RequestMapping("common")
 public class CommonController extends BaseController {
     /**
-     * 服务对象
+     * OSS文件上传服务
      */
-    @Resource
-    private com.javaPro.myProject.common.util.uploadUtil uploadUtil;
+    @Autowired
+    private FileUploadService fileUploadService;
 
     /**
-     * 分页查询
+     * 文件上传到OSS
      *
-     * @return 查询结果
+     * @param file 上传的文件
+     * @return 上传结果，包含OSS文件URL
      */
     @PostMapping("upload")
-    public AjaxResult queryByPage(MultipartFile file) {
-        String upload = uploadUtil.upload(file);
-       return AjaxResult.ok(upload);
+    public AjaxResult upload(MultipartFile file) {
+        try {
+            String ossUrl = fileUploadService.uploadFile(file);
+            return AjaxResult.ok(ossUrl);
+        } catch (Exception e) {
+            return AjaxResult.error("文件上传失败: " + e.getMessage());
+        }
     }
 
 

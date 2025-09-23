@@ -75,6 +75,9 @@
                 <a href="/web/userblog"  class="nav-link ">网站资讯/公告</a>
               </li>
               <li class="nav-item">
+                <a href="/web/chongzhi"  class="nav-link " title="充值">充值中心</a>
+              </li>
+              <li class="nav-item">
                 <a href="/web/personal"  class="nav-link " title="个人中心"><i class="fa fa-user"></i></a>
               </li>
             </ul>
@@ -107,10 +110,10 @@
               <div class="widget-menu">
                 <div class="widget-search-bar">
                   <form role="search" method="get" class="d-flex position-relative">
-                    <form class="d-flex mt-3 gap-0" action="index.html">
-                      <input v-model="queryParams.productname" class="form-control form-control-lg rounded-2 bg-light" type="email" placeholder="根据名称搜索" aria-label="Search here">
-                      <button class="btn bg-transparent position-absolute end-0" @click="getList(null)" type="button"><i class="fa fa-search"></i></button>
-                    </form>
+                    <div class="d-flex mt-3 gap-0">
+                      <input v-model="queryParams.productname" class="form-control form-control-lg rounded-2 bg-light" type="text" placeholder="根据名称搜索" aria-label="Search here" @keyup.enter="handleSearch">
+                      <button class="btn bg-transparent position-absolute end-0" @click="handleSearch" type="button"><i class="fa fa-search"></i></button>
+                    </div>
                   </form>
                 </div>
               </div>
@@ -122,6 +125,43 @@
                   </li>
                   <li class="cat-item" v-for="item in producttypeList">
                     <a href="javascript:void(0)" @click="getList(item.id)" class="nav-link">{{item.typeName}}</a>
+                  </li>
+                </ul>
+              </div>
+
+              <!-- 时间段筛选 -->
+              <div class="widget-product-categories pt-5">
+                <h5 class="widget-title">服务时间段</h5>
+                <div class="time-filter">
+                  <div class="mb-3">
+                    <label class="form-label">开始时间</label>
+                    <input v-model="queryParams.serviceStartTime" type="time" class="form-control" @change="handleTimeFilter">
+                  </div>
+                  <div class="mb-3">
+                    <label class="form-label">结束时间</label>
+                    <input v-model="queryParams.serviceEndTime" type="time" class="form-control" @change="handleTimeFilter">
+                  </div>
+                </div>
+              </div>
+
+              <!-- 评分筛选 -->
+              <div class="widget-product-categories pt-5">
+                <h5 class="widget-title">服务商评分</h5>
+                <ul class="rating-filter sidebar-list list-unstyled">
+                  <li class="cat-item">
+                    <a href="javascript:void(0)" @click="handleRatingFilter('all')" class="nav-link">全部评分</a>
+                  </li>
+                  <li class="cat-item">
+                    <a href="javascript:void(0)" @click="handleRatingFilter(4.5)" class="nav-link">4.5分以上</a>
+                  </li>
+                  <li class="cat-item">
+                    <a href="javascript:void(0)" @click="handleRatingFilter(4.0)" class="nav-link">4.0分以上</a>
+                  </li>
+                  <li class="cat-item">
+                    <a href="javascript:void(0)" @click="handleRatingFilter(3.5)" class="nav-link">3.5分以上</a>
+                  </li>
+                  <li class="cat-item">
+                    <a href="javascript:void(0)" @click="handleRatingFilter(3.0)" class="nav-link">3.0分以上</a>
                   </li>
                 </ul>
               </div>
@@ -335,6 +375,9 @@
         queryParams: {
           pageSize: 10,
           pageNum: 1,
+          serviceStartTime: '',
+          serviceEndTime: '',
+          companyRating: null,
         },
         title: "",
         rules: {
@@ -469,6 +512,26 @@
         let that = this;
         that.getList()
       },
+      // 处理搜索
+      handleSearch() {
+        let that = this;
+        that.queryParams.pageNum = 1; // 重置到第一页
+        that.getList();
+      },
+      // 处理时间筛选
+      handleTimeFilter() {
+        let that = this;
+        that.queryParams.pageNum = 1; // 重置到第一页
+        that.getList();
+      },
+      // 处理评分筛选
+      handleRatingFilter(rating) {
+        let that = this;
+        that.queryParams.companyRating = rating === 'all' ? null : rating;
+        that.queryParams.pageNum = 1; // 重置到第一页
+        that.getList();
+      },
+
       // 获取列表
       getList(typeId) {
         let that = this;
@@ -484,7 +547,12 @@
         if (typeId == 'all'){
           window.location.href = "/web/userproductlist"
         }
-        that.queryParams.producttype = typeId ? typeId:type
+        // 只有在指定了typeId时才设置producttype，否则保持原有的producttype或从URL参数获取
+        if (typeId !== undefined && typeId !== null) {
+          that.queryParams.producttype = typeId;
+        } else if (!that.queryParams.producttype && type) {
+          that.queryParams.producttype = type;
+        }
 
 
         $.ajax({

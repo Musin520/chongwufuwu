@@ -88,7 +88,71 @@ public class Product implements Serializable {
     private String detailimg;
     private List<String> detailImgList;
 
+    /**
+     * 服务开始时间
+     */
+    private String serviceStartTime;
 
+    /**
+     * 服务结束时间
+     */
+    private String serviceEndTime;
+
+    /**
+     * 服务商信息（关联查询时使用）
+     */
+    private String companyName;
+    private Double companyRating;
+    private Integer companyRatingCount;
+    private String companyServiceArea;
+
+    public String getServiceStartTime() {
+        return serviceStartTime;
+    }
+
+    public void setServiceStartTime(String serviceStartTime) {
+        this.serviceStartTime = serviceStartTime;
+    }
+
+    public String getServiceEndTime() {
+        return serviceEndTime;
+    }
+
+    public void setServiceEndTime(String serviceEndTime) {
+        this.serviceEndTime = serviceEndTime;
+    }
+
+    public String getCompanyName() {
+        return companyName;
+    }
+
+    public void setCompanyName(String companyName) {
+        this.companyName = companyName;
+    }
+
+    public Double getCompanyRating() {
+        return companyRating;
+    }
+
+    public void setCompanyRating(Double companyRating) {
+        this.companyRating = companyRating;
+    }
+
+    public Integer getCompanyRatingCount() {
+        return companyRatingCount;
+    }
+
+    public void setCompanyRatingCount(Integer companyRatingCount) {
+        this.companyRatingCount = companyRatingCount;
+    }
+
+    public String getCompanyServiceArea() {
+        return companyServiceArea;
+    }
+
+    public void setCompanyServiceArea(String companyServiceArea) {
+        this.companyServiceArea = companyServiceArea;
+    }
 
 }
 

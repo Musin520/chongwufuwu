@@ -1,5 +1,7 @@
 # 默认忽略的文件
 /shelf/
+/target/
+# 用户特定的设置
 /workspace.xml
 # 数据源本地存储已忽略文件
 /../../../../../../:\2025毕设\游戏道具\shopping-mall\myJavaProject\.idea/dataSources/

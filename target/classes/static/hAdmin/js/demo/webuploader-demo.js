@@ -80,9 +80,8 @@ jQuery(function() {
 
         disableGlobalDnd: true,
 
-        chunked: true,
-        // server: 'http://webuploader.duapp.com/server/fileupload.php',
-        server: 'http://2betop.net/fileupload.php',
+        chunked: false,
+        server: '/api/upload/image',  // 现在使用OSS上传接口
         fileNumLimit: 300,
         fileSizeLimit: 5 * 1024 * 1024,    // 200 M
         fileSingleSizeLimit: 1 * 1024 * 1024    // 50 M

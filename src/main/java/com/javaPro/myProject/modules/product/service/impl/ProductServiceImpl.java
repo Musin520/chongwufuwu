@@ -36,10 +36,11 @@ private UserlikeDao userlikeDao;
     @Override
     public Product queryById(Integer id) {
         Product product = this.productDao.queryById(id);
-        List<String> list = JSON.parseArray(product.getDetailimg(), String.class);
-        System.out.println("list = " + list);
-        product.setDetailImgList( list  );
-
+        if (product != null && product.getDetailimg() != null) {
+            List<String> list = JSON.parseArray(product.getDetailimg(), String.class);
+            System.out.println("list = " + list);
+            product.setDetailImgList(list);
+        }
         return product;
     }
 
@@ -52,18 +53,22 @@ private UserlikeDao userlikeDao;
     @Override
     public List<Product> queryByPage(Product product) {
         List<Product> products = this.productDao.queryAllByLimit(product);
-        if (product.getUserid()!= null) {
-            if (!CollectionUtils.isEmpty(products)){
-                for (Product item : products) {
+        if (!CollectionUtils.isEmpty(products)){
+            for (Product item : products) {
+                // 始终设置detailImgList
+                if (item.getDetailimg() != null) {
+                    item.setDetailImgList(JSON.parseArray(item.getDetailimg(), String.class));
+                }
+
+                // 只有当userid不为null时才处理收藏逻辑
+                if (product.getUserid() != null) {
                     Userlike userlike = new Userlike();
                     userlike.setProductid(item.getId());
-                    userlike.setUserid( Integer.valueOf(product.getUserid()) );
+                    userlike.setUserid(Integer.valueOf(product.getUserid()));
                     List<Userlike> userlikes = userlikeDao.queryAllByLimit(userlike);
                     item.setLikeFlag(!CollectionUtils.isEmpty(userlikes));
-                    item.setDetailImgList(  JSON.parseArray(item.getDetailimg(),String.class)   );
                 }
             }
-
         }
         return products;
     }

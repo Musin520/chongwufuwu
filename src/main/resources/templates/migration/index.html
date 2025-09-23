@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>图片迁移工具</title>
+    <link href="/static/element/element.css" rel="stylesheet">
+    <link href="/static/hAdmin/css/font-awesome.css?v=4.4.0" rel="stylesheet">
+    <link href="/static/hAdmin/css/plugins/toastr/toastr.min.css" rel="stylesheet">
+    <script src="/static/DemoBootStrap/js/vue.js"></script>
+    <script src="/static/element/element.js"></script>
+    <script src="/static/hAdmin/js/plugins/toastr/toastr.min.js"></script>
+    <script src="/static/js/GloJs.js"></script>
+    <style>
+        .migration-container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .migration-card {
+            margin-bottom: 20px;
+        }
+        .warning-text {
+            color: #E6A23C;
+            font-weight: bold;
+        }
+        .success-text {
+            color: #67C23A;
+        }
+        .error-text {
+            color: #F56C6C;
+        }
+    </style>
+</head>
+<body>
+<div id="app" class="migration-container">
+    <el-card class="migration-card">
+        <div slot="header" class="clearfix">
+            <span style="font-size: 18px; font-weight: bold;">
+                <i class="fa fa-cloud-upload"></i> 图片迁移到OSS工具
+            </span>
+        </div>
+        
+        <el-alert
+            title="重要提示"
+            type="warning"
+            :closable="false"
+            show-icon>
+            <p>此工具将把本地存储的图片迁移到阿里云OSS，请在执行前确保：</p>
+            <ul>
+                <li>已正确配置OSS参数</li>
+                <li>OSS账户有足够的存储空间</li>
+                <li>建议在维护时间执行，避免影响用户访问</li>
+                <li>执行前请备份数据库</li>
+            </ul>
+        </el-alert>
+        
+        <div style="margin-top: 20px;">
+            <h3>迁移选项</h3>
+            
+            <el-row :gutter="20" style="margin-top: 20px;">
+                <el-col :span="12">
+                    <el-card class="migration-card">
+                        <div slot="header">
+                            <i class="fa fa-shopping-cart"></i> 产品图片迁移
+                        </div>
+                        <p>迁移所有产品的主图片和详情图片</p>
+                        <el-button 
+                            type="primary" 
+                            :loading="productLoading"
+                            @click="migrateProducts">
+                            <i class="fa fa-upload"></i> 迁移产品图片
+                        </el-button>
+                    </el-card>
+                </el-col>
+                
+                <el-col :span="12">
+                    <el-card class="migration-card">
+                        <div slot="header">
+                            <i class="fa fa-user"></i> 用户头像迁移
+                        </div>
+                        <p>迁移所有用户的头像图片</p>
+                        <el-button 
+                            type="primary" 
+                            :loading="userLoading"
+                            @click="migrateUsers">
+                            <i class="fa fa-upload"></i> 迁移用户头像
+                        </el-button>
+                    </el-card>
+                </el-col>
+            </el-row>
+            
+            <el-row :gutter="20" style="margin-top: 20px;">
+                <el-col :span="12">
+                    <el-card class="migration-card">
+                        <div slot="header">
+                            <i class="fa fa-bullhorn"></i> 公告图片迁移
+                        </div>
+                        <p>迁移所有公告的图片</p>
+                        <el-button 
+                            type="primary" 
+                            :loading="noticeLoading"
+                            @click="migrateNotices">
+                            <i class="fa fa-upload"></i> 迁移公告图片
+                        </el-button>
+                    </el-card>
+                </el-col>
+                
+                <el-col :span="12">
+                    <el-card class="migration-card">
+                        <div slot="header">
+                            <i class="fa fa-file-image-o"></i> 静态图片迁移
+                        </div>
+                        <p>迁移static/img文件夹中的图片</p>
+                        <el-button 
+                            type="primary" 
+                            :loading="staticLoading"
+                            @click="migrateStatic">
+                            <i class="fa fa-upload"></i> 迁移静态图片
+                        </el-button>
+                    </el-card>
+                </el-col>
+            </el-row>
+            
+            <el-divider></el-divider>
+            
+            <el-card class="migration-card">
+                <div slot="header" class="warning-text">
+                    <i class="fa fa-exclamation-triangle"></i> 一键迁移所有图片
+                </div>
+                <p>这将迁移所有类型的图片，包括产品图片、用户头像、公告图片和静态图片。</p>
+                <p class="warning-text">注意：这是一个耗时操作，请确保网络稳定！</p>
+                <el-button 
+                    type="danger" 
+                    size="large"
+                    :loading="allLoading"
+                    @click="migrateAll">
+                    <i class="fa fa-cloud-upload"></i> 一键迁移所有图片
+                </el-button>
+            </el-card>
+        </div>
+        
+        <div v-if="logs.length > 0" style="margin-top: 30px;">
+            <h3>迁移日志</h3>
+            <el-card>
+                <div v-for="(log, index) in logs" :key="index" 
+                     :class="{'success-text': log.type === 'success', 'error-text': log.type === 'error'}">
+                    <i :class="log.type === 'success' ? 'fa fa-check' : 'fa fa-times'"></i>
+                    {{ log.time }} - {{ log.message }}
+                </div>
+            </el-card>
+        </div>
+    </el-card>
+</div>
+
+<script>
+new Vue({
+    el: '#app',
+    data() {
+        return {
+            baseUrl: Glo_BaseUrl,
+            productLoading: false,
+            userLoading: false,
+            noticeLoading: false,
+            staticLoading: false,
+            allLoading: false,
+            logs: []
+        }
+    },
+    methods: {
+        addLog(message, type = 'success') {
+            this.logs.unshift({
+                time: new Date().toLocaleTimeString(),
+                message: message,
+                type: type
+            });
+            // 只保留最近20条日志
+            if (this.logs.length > 20) {
+                this.logs = this.logs.slice(0, 20);
+            }
+        },
+        
+        migrateProducts() {
+            this.productLoading = true;
+            this.addLog('开始迁移产品图片...', 'info');
+            
+            $.ajax({
+                url: this.baseUrl + '/api/migration/migrateProducts',
+                type: 'POST',
+                success: (data) => {
+                    this.productLoading = false;
+                    if (data.code === 200) {
+                        this.addLog('产品图片迁移成功！', 'success');
+                        toastr.success('产品图片迁移成功！');
+                    } else {
+                        this.addLog('产品图片迁移失败: ' + data.msg, 'error');
+                        toastr.error('产品图片迁移失败: ' + data.msg);
+                    }
+                },
+                error: () => {
+                    this.productLoading = false;
+                    this.addLog('产品图片迁移失败: 网络错误', 'error');
+                    toastr.error('网络错误，请重试');
+                }
+            });
+        },
+        
+        migrateUsers() {
+            this.userLoading = true;
+            this.addLog('开始迁移用户头像...', 'info');
+            
+            $.ajax({
+                url: this.baseUrl + '/api/migration/migrateUsers',
+                type: 'POST',
+                success: (data) => {
+                    this.userLoading = false;
+                    if (data.code === 200) {
+                        this.addLog('用户头像迁移成功！', 'success');
+                        toastr.success('用户头像迁移成功！');
+                    } else {
+                        this.addLog('用户头像迁移失败: ' + data.msg, 'error');
+                        toastr.error('用户头像迁移失败: ' + data.msg);
+                    }
+                },
+                error: () => {
+                    this.userLoading = false;
+                    this.addLog('用户头像迁移失败: 网络错误', 'error');
+                    toastr.error('网络错误，请重试');
+                }
+            });
+        },
+        
+        migrateNotices() {
+            this.noticeLoading = true;
+            this.addLog('开始迁移公告图片...', 'info');
+            
+            $.ajax({
+                url: this.baseUrl + '/api/migration/migrateNotices',
+                type: 'POST',
+                success: (data) => {
+                    this.noticeLoading = false;
+                    if (data.code === 200) {
+                        this.addLog('公告图片迁移成功！', 'success');
+                        toastr.success('公告图片迁移成功！');
+                    } else {
+                        this.addLog('公告图片迁移失败: ' + data.msg, 'error');
+                        toastr.error('公告图片迁移失败: ' + data.msg);
+                    }
+                },
+                error: () => {
+                    this.noticeLoading = false;
+                    this.addLog('公告图片迁移失败: 网络错误', 'error');
+                    toastr.error('网络错误，请重试');
+                }
+            });
+        },
+        
+        migrateStatic() {
+            this.staticLoading = true;
+            this.addLog('开始迁移静态图片...', 'info');
+            
+            $.ajax({
+                url: this.baseUrl + '/api/migration/migrateStatic',
+                type: 'POST',
+                success: (data) => {
+                    this.staticLoading = false;
+                    if (data.code === 200) {
+                        this.addLog('静态图片迁移成功！', 'success');
+                        toastr.success('静态图片迁移成功！');
+                    } else {
+                        this.addLog('静态图片迁移失败: ' + data.msg, 'error');
+                        toastr.error('静态图片迁移失败: ' + data.msg);
+                    }
+                },
+                error: () => {
+                    this.staticLoading = false;
+                    this.addLog('静态图片迁移失败: 网络错误', 'error');
+                    toastr.error('网络错误，请重试');
+                }
+            });
+        },
+        
+        migrateAll() {
+            this.$confirm('确定要迁移所有图片吗？这个操作可能需要较长时间。', '确认迁移', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+            }).then(() => {
+                this.allLoading = true;
+                this.addLog('开始迁移所有图片...', 'info');
+                
+                $.ajax({
+                    url: this.baseUrl + '/api/migration/migrateAll',
+                    type: 'POST',
+                    timeout: 300000, // 5分钟超时
+                    success: (data) => {
+                        this.allLoading = false;
+                        if (data.code === 200) {
+                            this.addLog('所有图片迁移成功！', 'success');
+                            toastr.success('所有图片迁移成功！');
+                        } else {
+                            this.addLog('图片迁移失败: ' + data.msg, 'error');
+                            toastr.error('图片迁移失败: ' + data.msg);
+                        }
+                    },
+                    error: () => {
+                        this.allLoading = false;
+                        this.addLog('图片迁移失败: 网络错误或超时', 'error');
+                        toastr.error('网络错误或超时，请重试');
+                    }
+                });
+            });
+        }
+    }
+});
+</script>
+</body>
+</html>

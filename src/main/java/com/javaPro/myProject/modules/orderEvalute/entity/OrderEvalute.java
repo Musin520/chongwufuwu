@@ -33,6 +33,11 @@ public class OrderEvalute implements Serializable {
 //    企业信息
     private Integer companyid;
 
+    /**
+     * 评分（1-5分）
+     */
+    private Integer rating;
+
     private Sysuser sysuser;
 
 }

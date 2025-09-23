@@ -61,6 +61,28 @@ public class Company implements Serializable {
      */
     private Integer createid;
 
+    /**
+     * 服务时间段（JSON格式存储）
+     */
+    private String serviceTime;
+
+    /**
+     * 平均评分
+     */
+    private Double avgRating;
+
+    /**
+     * 评价总数
+     */
+    private Integer ratingCount;
+
+    /**
+     * 服务区域
+     */
+    private String serviceArea;
+
+
+
 
     public Integer getId() {
         return id;
@@ -166,5 +188,36 @@ public class Company implements Serializable {
         this.createid = createid;
     }
 
+    public String getServiceTime() {
+        return serviceTime;
+    }
+
+    public void setServiceTime(String serviceTime) {
+        this.serviceTime = serviceTime;
+    }
+
+    public Double getAvgRating() {
+        return avgRating;
+    }
+
+    public void setAvgRating(Double avgRating) {
+        this.avgRating = avgRating;
+    }
+
+    public Integer getRatingCount() {
+        return ratingCount;
+    }
+
+    public void setRatingCount(Integer ratingCount) {
+        this.ratingCount = ratingCount;
+    }
+
+    public String getServiceArea() {
+        return serviceArea;
+    }
+
+    public void setServiceArea(String serviceArea) {
+        this.serviceArea = serviceArea;
+    }
 }
 

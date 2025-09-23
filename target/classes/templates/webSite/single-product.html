@@ -72,6 +72,9 @@
                 <a href="/web/userblog"  class="nav-link ">网站资讯/公告</a>
               </li>
               <li class="nav-item">
+                <a href="/web/chongzhi"  class="nav-link " title="充值">充值中心</a>
+              </li>
+              <li class="nav-item">
                 <a href="/web/personal"  class="nav-link " title="个人中心"><i class="fa fa-user"></i></a>
               </li>
             </ul>
@@ -197,6 +200,34 @@
                   <span>{{productInfo.typeName}}</span>
                 </div>
 
+              </div>
+
+              <!-- 服务商信息 -->
+              <div class="service-provider-info py-4 border-top">
+                <h5 class="text-dark mb-3">服务商信息</h5>
+                <div class="provider-details">
+                  <div class="meta-item d-flex align-items-baseline mb-2">
+                    <h6 class="item-title no-margin pe-2">服务商名称:</h6>
+                    <span class="text-primary fw-bold">{{productInfo.companyName || '暂无信息'}}</span>
+                    <button v-if="productInfo.companyName" @click="showProviderDetail" class="btn btn-sm btn-outline-primary ms-2">查看详情</button>
+                  </div>
+                  <div class="meta-item d-flex align-items-baseline mb-2">
+                    <h6 class="item-title no-margin pe-2">服务评分:</h6>
+                    <span class="text-warning">
+                      <i v-for="n in 5" :key="n" class="fa" :class="n <= Math.floor(productInfo.companyRating || 0) ? 'fa-star' : 'fa-star-o'"></i>
+                      {{(productInfo.companyRating || 0).toFixed(1)}}分 ({{productInfo.companyRatingCount || 0}}条评价)
+                    </span>
+                  </div>
+                  <div class="meta-item d-flex align-items-baseline mb-2">
+                    <h6 class="item-title no-margin pe-2">服务区域:</h6>
+                    <span>{{productInfo.companyServiceArea || '暂无信息'}}</span>
+                  </div>
+                  <div class="meta-item d-flex align-items-baseline mb-2">
+                    <h6 class="item-title no-margin pe-2">服务时间:</h6>
+                    <span>{{productInfo.serviceStartTime || '暂无'}} - {{productInfo.serviceEndTime || '暂无'}}</span>
+                  </div>
+
+                </div>
               </div>
             </div>
           </div>
@@ -383,6 +414,61 @@
       </div>
     </div>
 
+
+
+    <!-- 服务商详情弹窗 -->
+    <el-dialog title="服务商详情" :visible.sync="providerDialogVisible" width="60%">
+      <div v-if="providerInfo">
+        <el-descriptions :column="2" title="基本信息" border>
+          <el-descriptions-item label="服务商名称">{{providerInfo.companyname}}</el-descriptions-item>
+          <el-descriptions-item label="法人代表">{{providerInfo.faren}}</el-descriptions-item>
+          <el-descriptions-item label="联系电话">{{providerInfo.phonenumber}}</el-descriptions-item>
+          <el-descriptions-item label="营业执照号">{{providerInfo.yingyezhizhaohao}}</el-descriptions-item>
+          <el-descriptions-item label="经营范围" :span="2">{{providerInfo.jingyingfanwei}}</el-descriptions-item>
+          <el-descriptions-item label="服务地址" :span="2">{{providerInfo.address}}</el-descriptions-item>
+          <el-descriptions-item label="服务区域">{{providerInfo.serviceArea || '暂无信息'}}</el-descriptions-item>
+          <el-descriptions-item label="服务时间">{{providerInfo.serviceTime || '暂无信息'}}</el-descriptions-item>
+          <el-descriptions-item label="平均评分">
+            <span class="text-warning">
+              <i v-for="n in 5" :key="n" class="fa" :class="n <= Math.floor(providerInfo.avgRating || 0) ? 'fa-star' : 'fa-star-o'"></i>
+              {{(providerInfo.avgRating || 0).toFixed(1)}}分
+            </span>
+          </el-descriptions-item>
+          <el-descriptions-item label="评价总数">{{providerInfo.ratingCount || 0}}条</el-descriptions-item>
+          <el-descriptions-item label="注册时间">{{providerInfo.zhuceshijian}}</el-descriptions-item>
+          <el-descriptions-item label="状态">
+            <el-tag :type="providerInfo.status === '1' ? 'success' : 'danger'">
+              {{providerInfo.status === '1' ? '正常营业' : '暂停服务'}}
+            </el-tag>
+          </el-descriptions-item>
+        </el-descriptions>
+
+        <!-- 用户评价列表 -->
+        <div class="mt-4">
+          <h5>用户评价</h5>
+          <el-table :data="providerEvaluations" style="width: 100%" v-loading="evaluationLoading">
+            <el-table-column prop="sysuser.username" label="用户" width="120"></el-table-column>
+            <el-table-column prop="rating" label="评分" width="100">
+              <template slot-scope="scope">
+                <span class="text-warning">
+                  <i v-for="n in 5" :key="n" class="fa fa-star" :class="n <= scope.row.rating ? 'text-warning' : 'text-muted'"></i>
+                </span>
+              </template>
+            </el-table-column>
+            <el-table-column prop="content" label="评价内容"></el-table-column>
+            <el-table-column prop="createtime" label="评价时间" width="180">
+              <template slot-scope="scope">
+                {{new Date(scope.row.createtime).toLocaleString()}}
+              </template>
+            </el-table-column>
+          </el-table>
+          <div v-if="!providerEvaluations || providerEvaluations.length === 0" class="text-center py-4 text-muted">
+            暂无评价
+          </div>
+        </div>
+      </div>
+    </el-dialog>
+
   </div>
     <script src="/static/webSite/js/jquery-1.11.0.min.js"></script>
 <!--    <script src="https://cdn.bootcdn.net/ajax/libs/Swiper/9.4.1/swiper-bundle.min.js"></script>-->
@@ -418,6 +504,11 @@
           currentImgInfo: "",
           open: false,
           openDetail: false,
+          providerDialogVisible: false,
+          providerInfo: null,
+          providerEvaluations: [],
+          evaluationLoading: false,
+
           queryParams: {
             pageSize: 10,
             pageNum: 1,
@@ -482,8 +573,14 @@
             },
             success: function (data) {
               if (data.code !== 500) {
-           that.productInfo = data.Data
-                that.currentImgInfo = data.Data.detailImgList[0]
+                that.productInfo = data.Data
+                // 安全检查detailImgList是否存在且不为空
+                if (data.Data.detailImgList && data.Data.detailImgList.length > 0) {
+                  that.currentImgInfo = data.Data.detailImgList[0]
+                } else {
+                  // 如果detailImgList为空，使用主图片
+                  that.currentImgInfo = data.Data.img
+                }
                 that.getList()
               }
             },
@@ -516,8 +613,60 @@
             }
           });
         },
+        // 显示服务商详情
+        showProviderDetail() {
+          let that = this;
+          if (!that.productInfo.companyid) {
+            toastr.error("服务商信息不完整", '提示');
+            return;
+          }
 
+          that.providerDialogVisible = true;
+          that.evaluationLoading = true;
 
+          // 获取服务商详细信息
+          $.ajax({
+            url: that.baseUrl + "/company/detail",
+            type: "GET",
+            data: {
+              id: that.productInfo.companyid
+            },
+            success: function (data) {
+              if (data.code === 200) {
+                that.providerInfo = data.Data;
+              } else {
+                toastr.error("获取服务商信息失败", '提示');
+              }
+            },
+            error: function () {
+              toastr.error("服务器异常", '提示');
+            }
+          });
+
+          // 获取服务商评价
+          $.ajax({
+            url: that.baseUrl + "/orderEvalute",
+            type: "GET",
+            data: {
+              pageNum: 1,
+              pageSize: 50,
+              companyid: that.productInfo.companyid
+            },
+            success: function (data) {
+              that.evaluationLoading = false;
+              if (data.code !== 500) {
+                that.providerEvaluations = data.list || [];
+              } else {
+                that.providerEvaluations = [];
+              }
+            },
+            error: function () {
+              that.evaluationLoading = false;
+              that.providerEvaluations = [];
+              toastr.error("获取评价信息失败", '提示');
+            }
+          });
+        },
 
       },
       watch: {},

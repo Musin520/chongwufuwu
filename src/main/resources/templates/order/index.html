@@ -188,6 +188,9 @@
                                             width="350px"
                                     >
                                         <template slot-scope="scope">
+                                            <el-button @click="handleDetail(scope.row)" round size="small"
+                                                       type="info"><i class="fa fa-eye"></i> 详情
+                                            </el-button>
                                             <el-button @click="handleDel(scope.row.id)" round size="small"
                                                        v-if="role === '1'"
                                                        type="danger"><i class="fa fa-trash"></i> 删除
@@ -233,22 +236,43 @@
             </el-form-item>
         </el-form>
     </el-dialog>
-    <el-dialog :visible.sync="openDetail" width="50%">
-        <el-descriptions :column="4" :title="title" border>
-            <el-descriptions-item :span="4" label="图片">
-                <el-image :src="form.img"
-                          style="width: 100px;height: 100px;"></el-image>
-            </el-descriptions-item>
-            <el-descriptions-item :span="2" label="销售商名称">{{form.companyname}}</el-descriptions-item>
-            <el-descriptions-item :span="2" label="营业执照统一信贷码">{{form.yingyezhizhaohao}}</el-descriptions-item>
-            <el-descriptions-item :span="2" label="联系方式">{{form.phonenumber}}</el-descriptions-item>
-            <el-descriptions-item :span="2" label="法人">{{form.faren}}</el-descriptions-item>
-            <el-descriptions-item :span="2" label="注册地址">{{form.address}}</el-descriptions-item>
-            <el-descriptions-item :span="2" label="注册时间">{{form.zhuceshijian}}</el-descriptions-item>
-            <el-descriptions-item :span="2" label="创建时间">{{form.createtime}}</el-descriptions-item>
-            <el-descriptions-item :span="2" label="创建时间">{{form.createtime}}</el-descriptions-item>
-            <el-descriptions-item :span="4" label="经营范围">{{form.jingyingfanwei}}</el-descriptions-item>
+    <el-dialog :title="'订单详情 - 订单ID: ' + form.id" :visible.sync="openDetail" width="70%">
+        <el-descriptions :column="4" border>
+            <el-descriptions-item :span="2" label="订单ID">{{form.id}}</el-descriptions-item>
+            <el-descriptions-item :span="2" label="下单用户">{{form.username}}</el-descriptions-item>
+            <el-descriptions-item :span="2" label="用户联系方式">{{form.account}}</el-descriptions-item>
+            <el-descriptions-item :span="2" label="下单时间">{{form.createtime}}</el-descriptions-item>
+            <el-descriptions-item :span="2" label="更新时间">{{form.updatetime}}</el-descriptions-item>
+            <el-descriptions-item :span="2" label="备注">{{form.remark || '无'}}</el-descriptions-item>
+            <el-descriptions-item :span="4" label="评价内容">{{form.content || '暂无评价'}}</el-descriptions-item>
         </el-descriptions>
+
+        <div style="margin-top: 20px;">
+            <h4>订单商品详情</h4>
+            <el-table v-if="form.cartList" :data="form.cartList" border>
+                <el-table-column align="center" label="商品图片" width="120">
+                    <template slot-scope="scope">
+                        <el-image :src="scope.row.product.img" style="width: 80px;height: 80px;"></el-image>
+                    </template>
+                </el-table-column>
+                <el-table-column align="center" label="商品名称" prop="product.productname"></el-table-column>
+                <el-table-column align="center" label="单价" prop="product.kedanjia">
+                    <template slot-scope="scope">
+                        ￥{{scope.row.product.kedanjia}}
+                    </template>
+                </el-table-column>
+                <el-table-column align="center" label="数量" prop="number"></el-table-column>
+                <el-table-column align="center" label="小计">
+                    <template slot-scope="scope">
+                        ￥{{(parseFloat(scope.row.product.kedanjia) * scope.row.number).toFixed(2)}}
+                    </template>
+                </el-table-column>
+            </el-table>
+        </div>
+
+        <div slot="footer" class="dialog-footer">
+            <el-button @click="openDetail = false">关闭</el-button>
+        </div>
     </el-dialog>
 </div>
 
@@ -475,9 +499,8 @@
             handleDetail(row) {
                 let that = this;
                 that.form = row
-                that.title = "详情"
+                that.title = "订单详情"
                 that.openDetail = true
-
             },
             handleDel(id) {
                 let that = this;

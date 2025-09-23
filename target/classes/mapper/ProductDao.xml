@@ -21,16 +21,27 @@
         <result property="spare1" column="spare1" jdbcType="VARCHAR"/>
         <result property="spare2" column="spare2" jdbcType="VARCHAR"/>
         <result property="typeName" column="type_name" jdbcType="VARCHAR"/>
+        <result property="detailimg" column="detailimg" jdbcType="VARCHAR"/>
+        <result property="serviceStartTime" column="service_start_time" jdbcType="VARCHAR"/>
+        <result property="serviceEndTime" column="service_end_time" jdbcType="VARCHAR"/>
+        <result property="companyName" column="company_name" jdbcType="VARCHAR"/>
+        <result property="companyRating" column="company_rating" jdbcType="DOUBLE"/>
+        <result property="companyRatingCount" column="company_rating_count" jdbcType="INTEGER"/>
+        <result property="companyServiceArea" column="company_service_area" jdbcType="VARCHAR"/>
     </resultMap>
 
     <!--查询单个-->
     <select id="queryById" resultMap="ProductMap">
         select
             p.id, productname, productdes, p.img, chengben, kedanjia, kucun, fahuotianshu, chandi, guige,
-            companyid, createtime, p.status, updatetime, producttype, spare1, spare2,detailimg
-                ,t.type_name
+            companyid, p.createtime, p.status, p.updatetime, producttype, spare1, spare2, detailimg,
+            service_start_time, service_end_time,
+            t.type_name,
+            c.companyname as company_name, c.avg_rating as company_rating,
+            c.rating_count as company_rating_count, c.service_area as company_service_area
         from product p
                  left join producttype t on t.id = p.producttype
+                 left join company c on c.id = p.companyid
         where p.id = #{id}
     </select>
 
@@ -38,10 +49,14 @@
     <select id="queryAllByLimit" resultMap="ProductMap">
         select
           p.id, productname, productdes, p.img, chengben, kedanjia, kucun, fahuotianshu, chandi, guige,
-               companyid, createtime, p.status, updatetime, producttype, spare1, spare2,detailimg
-        ,t.type_name
+               companyid, p.createtime, p.status, p.updatetime, producttype, spare1, spare2, detailimg,
+               service_start_time, service_end_time,
+               t.type_name,
+               c.companyname as company_name, c.avg_rating as company_rating,
+               c.rating_count as company_rating_count, c.service_area as company_service_area
         from product p
         left join producttype t on t.id = p.producttype
+        left join company c on c.id = p.companyid
         <where>
             <if test="id != null">
                 and p.id = #{id}
@@ -88,6 +103,7 @@
             <if test="spare2 != null and spare2 != ''">
                 and spare2 = #{spare2}
             </if>
+
         </where>
 order by createtime desc
     </select>
@@ -147,6 +163,15 @@ order by createtime desc
             </if>
             <if test="spare2 != null and spare2 != ''">
                 and spare2 = #{spare2}
+            </if>
+            <if test="serviceStartTime != null and serviceStartTime != ''">
+                and service_start_time &gt;= #{serviceStartTime}
+            </if>
+            <if test="serviceEndTime != null and serviceEndTime != ''">
+                and service_end_time &lt;= #{serviceEndTime}
+            </if>
+            <if test="companyRating != null">
+                and c.avg_rating &gt;= #{companyRating}
             </if>
         </where>
     </select>

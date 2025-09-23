@@ -32,8 +32,13 @@ public class ProductController extends BaseController {
      */
     @GetMapping
     public ListByPage queryByPage(Product product) {
-        startPage();
-        return getList(this.productService.queryByPage(product));
+        try {
+            startPage();
+            return getList(this.productService.queryByPage(product));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return getList(500, "查询失败: " + e.getMessage());
+        }
     }
 
     /**

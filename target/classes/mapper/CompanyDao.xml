@@ -16,12 +16,18 @@
         <result property="updatetime" column="updatetime" jdbcType="TIMESTAMP"/>
         <result property="status" column="status" jdbcType="VARCHAR"/>
         <result property="createid" column="createid" jdbcType="INTEGER"/>
+        <result property="serviceTime" column="service_time" jdbcType="VARCHAR"/>
+        <result property="avgRating" column="avg_rating" jdbcType="DOUBLE"/>
+        <result property="ratingCount" column="rating_count" jdbcType="INTEGER"/>
+        <result property="serviceArea" column="service_area" jdbcType="VARCHAR"/>
+
     </resultMap>
 
     <!--查询单个-->
     <select id="queryById" resultMap="CompanyMap">
         select
-          id, companyname, img, yingyezhizhaohao, faren, phonenumber, jingyingfanwei, address, zhuceshijian, createtime, updatetime, status, createid
+          id, companyname, img, yingyezhizhaohao, faren, phonenumber, jingyingfanwei, address, zhuceshijian, createtime, updatetime, status, createid,
+          service_time, avg_rating, rating_count, service_area
         from company
         where id = #{id}
     </select>
@@ -29,7 +35,8 @@
     <!--查询指定行数据-->
     <select id="queryAllByLimit" resultMap="CompanyMap">
         select
-          id, companyname, img, yingyezhizhaohao, faren, phonenumber, jingyingfanwei, address, zhuceshijian, createtime, updatetime, status, createid
+          id, companyname, img, yingyezhizhaohao, faren, phonenumber, jingyingfanwei, address, zhuceshijian, createtime, updatetime, status, createid,
+          service_time, avg_rating, rating_count, service_area
         from company
         <where>
             <if test="id != null">

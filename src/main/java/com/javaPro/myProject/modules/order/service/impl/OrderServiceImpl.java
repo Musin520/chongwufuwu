@@ -104,10 +104,36 @@ private MessageDao messageDao;
             List<String> collect = shopcarts.stream().map(t -> t.getId() + "").collect(Collectors.toList());
 //            String s = String.join(",",collect);
 //            order.setCarid(s);
+            // 记录需要通知的服务商ID，避免重复通知
+            Set<Integer> notifiedCompanies = new HashSet<>();
+
             for (Shopcart shopcart1 : shopcarts) {
-                Order order1 = order;
+                Order order1 = new Order();
+                order1.setUserid(order.getUserid());
+                order1.setUsername(order.getUsername());
+                order1.setRemark(order.getRemark());
                 order1.setCarid(shopcart1.getId() + "");
                 this.orderDao.insert(order1);
+
+                // 获取商品信息以确定服务商
+                Product product = productDao.queryById(shopcart1.getProductid());
+                if (product != null && product.getCompanyid() != null) {
+                    Integer companyId = product.getCompanyid();
+
+                    // 如果该服务商还没有被通知过，则发送通知
+                    if (!notifiedCompanies.contains(companyId)) {
+                        // 发送订单通知给对应的服务商
+                        Message message = new Message();
+                        message.setSenderid(order.getUserid()); // 发送人是下单用户
+                        message.setReceiveid(companyId); // 接收人是服务商
+                        message.setContent("您有新的订单，订单用户：" + order.getUsername() + "，联系方式：" + sysuser.getPhonenumber());
+                        message.setStatus("0"); // 未处理状态
+                        message.setCreatetime(new Date());
+                        messageDao.insert(message);
+
+                        notifiedCompanies.add(companyId);
+                    }
+                }
             }
 
             for (String s1 : collect) {

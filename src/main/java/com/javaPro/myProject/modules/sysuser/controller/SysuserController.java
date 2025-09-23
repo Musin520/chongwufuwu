@@ -3,9 +3,10 @@ package com.javaPro.myProject.modules.sysuser.controller;
 import com.javaPro.myProject.common.controller.BaseController;
 import com.javaPro.myProject.common.model.AjaxResult;
 import com.javaPro.myProject.common.model.ListByPage;
-import com.javaPro.myProject.common.util.uploadUtil;
 import com.javaPro.myProject.modules.sysuser.entity.Sysuser;
 import com.javaPro.myProject.modules.sysuser.service.SysuserService;
+import com.javaPro.myProject.service.FileUploadService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -25,8 +26,9 @@ public class SysuserController extends BaseController {
      */
     @Resource
     private SysuserService sysuserService;
-@Resource
-private com.javaPro.myProject.common.util.uploadUtil uploadUtil;
+
+    @Autowired
+    private FileUploadService fileUploadService;
     /**
      * 分页查询
      *
@@ -74,11 +76,15 @@ private com.javaPro.myProject.common.util.uploadUtil uploadUtil;
     }
     @PostMapping("editUserPerson")
     public AjaxResult editUserPerson(MultipartFile file, Sysuser sysuser) {
-        if (file != null){
-            String upload = uploadUtil.upload(file);
-            sysuser.setImg(upload);
+        try {
+            if (file != null && !file.isEmpty()) {
+                String ossUrl = fileUploadService.uploadFile(file);
+                sysuser.setImg(ossUrl);
+            }
+            return AjaxResult.ok(this.sysuserService.update(sysuser));
+        } catch (Exception e) {
+            return AjaxResult.error("个人信息更新失败: " + e.getMessage());
         }
-        return AjaxResult.ok(this.sysuserService.update(sysuser));
     }
 
     /**
