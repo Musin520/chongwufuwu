@@ -37,6 +37,14 @@ public interface CompanyService {
     Company insert(Company company);
 
     /**
+     * 新增指定ID的数据
+     *
+     * @param company 实例对象
+     * @return 实例对象
+     */
+    Company insertWithId(Company company);
+
+    /**
      * 修改数据
      *
      * @param company 实例对象

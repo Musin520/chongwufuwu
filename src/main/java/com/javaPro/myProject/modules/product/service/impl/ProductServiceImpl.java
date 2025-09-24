@@ -6,6 +6,8 @@ import com.javaPro.myProject.modules.product.entity.Product;
 import com.javaPro.myProject.modules.product.service.ProductService;
 import com.javaPro.myProject.modules.userlike.dao.UserlikeDao;
 import com.javaPro.myProject.modules.userlike.entity.Userlike;
+import com.javaPro.myProject.modules.company.service.CompanyService;
+import com.javaPro.myProject.modules.company.entity.Company;
 import org.openqa.selenium.json.Json;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -25,8 +27,10 @@ import java.util.stream.Collectors;
 public class ProductServiceImpl implements ProductService {
     @Resource
     private ProductDao productDao;
-@Resource
-private UserlikeDao userlikeDao;
+    @Resource
+    private UserlikeDao userlikeDao;
+    @Resource
+    private CompanyService companyService;
     /**
      * 通过ID查询单条数据
      *
@@ -36,10 +40,30 @@ private UserlikeDao userlikeDao;
     @Override
     public Product queryById(Integer id) {
         Product product = this.productDao.queryById(id);
-        if (product != null && product.getDetailimg() != null) {
-            List<String> list = JSON.parseArray(product.getDetailimg(), String.class);
-            System.out.println("list = " + list);
-            product.setDetailImgList(list);
+        if (product != null) {
+            // 处理详情图片
+            if (product.getDetailimg() != null) {
+                List<String> list = JSON.parseArray(product.getDetailimg(), String.class);
+                System.out.println("list = " + list);
+                product.setDetailImgList(list);
+            }
+
+            // 获取服务商信息
+            if (product.getCompanyid() != null) {
+                System.out.println("Product companyid: " + product.getCompanyid());
+                Company company = companyService.queryById(product.getCompanyid());
+                if (company != null) {
+                    System.out.println("Found company: " + company.getCompanyname());
+                    product.setCompanyName(company.getCompanyname());
+                    product.setCompanyRating(company.getAvgRating());
+                    product.setCompanyRatingCount(company.getRatingCount());
+                    product.setCompanyServiceArea(company.getServiceArea());
+                } else {
+                    System.out.println("Company not found for id: " + product.getCompanyid());
+                }
+            } else {
+                System.out.println("Product companyid is null");
+            }
         }
         return product;
     }

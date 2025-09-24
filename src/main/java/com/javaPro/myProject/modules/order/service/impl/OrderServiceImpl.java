@@ -82,10 +82,25 @@ private MessageDao messageDao;
      */
     @Override
     public AjaxResult insert(Order order) {
-        Shopcart shopcart = new Shopcart();
-        shopcart.setUserid(order.getUserid());
-        shopcart.setSpare1("0");
-        List<Shopcart> shopcarts = shopcartDao.queryAllByLimit(shopcart);
+        List<Shopcart> shopcarts;
+
+        // 如果有选中的购物车ID，只处理选中的商品
+        if (order.getSelectedCartIds() != null && !order.getSelectedCartIds().isEmpty()) {
+            String[] cartIds = order.getSelectedCartIds().split(",");
+            shopcarts = new ArrayList<>();
+            for (String cartId : cartIds) {
+                Shopcart cart = shopcartDao.queryById(Integer.parseInt(cartId.trim()));
+                if (cart != null && cart.getSpare1().equals("0")) { // 确保是未下单的商品
+                    shopcarts.add(cart);
+                }
+            }
+        } else {
+            // 如果没有指定选中商品，则处理所有未下单商品（保持原有逻辑）
+            Shopcart shopcart = new Shopcart();
+            shopcart.setUserid(order.getUserid());
+            shopcart.setSpare1("0");
+            shopcarts = shopcartDao.queryAllByLimit(shopcart);
+        }
         Sysuser sysuser = sysuserDao.queryById(order.getUserid());
         Double money = sysuser.getMoney();
         Double sum = 0.0;

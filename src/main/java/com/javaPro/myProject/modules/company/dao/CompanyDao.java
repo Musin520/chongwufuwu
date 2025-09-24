@@ -46,6 +46,14 @@ public interface CompanyDao {
     int insert(Company company);
 
     /**
+     * 新增指定ID的数据
+     *
+     * @param company 实例对象
+     * @return 影响行数
+     */
+    int insertWithId(Company company);
+
+    /**
      * 批量新增数据（MyBatis原生foreach方法）
      *
      * @param entities List<Company> 实例对象列表

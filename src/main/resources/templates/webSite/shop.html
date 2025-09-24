@@ -21,6 +21,86 @@
     <link href="https://unpkg.com/element-ui/lib/theme-chalk/index.css" rel="stylesheet">
     <link href="/static/hAdmin/css/plugins/toastr/toastr.min.css" rel="stylesheet">
 
+    <style>
+      /* 种类导航悬停效果 */
+      .cat-item {
+        transition: all 0.3s ease;
+        border-radius: 5px;
+        margin: 2px 0;
+      }
+
+      .cat-item:hover {
+        background-color: #f8f9fa;
+        transform: translateX(5px);
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      }
+
+      .cat-item .nav-link {
+        padding: 8px 12px;
+        border-radius: 5px;
+        transition: all 0.3s ease;
+        color: #333;
+      }
+
+      .cat-item:hover .nav-link {
+        background-color: #007bff;
+        color: white;
+        text-decoration: none;
+      }
+
+      /* 产品卡片悬停效果 */
+      .product-item {
+        transition: all 0.3s ease;
+        border: 1px solid transparent;
+      }
+
+      .product-item:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        border-color: #007bff;
+      }
+
+      /* 时间筛选和评分筛选悬停效果 */
+      .time-filter .form-control:hover,
+      .time-filter .form-control:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
+      }
+
+      .rating-filter .cat-item {
+        transition: all 0.3s ease;
+        border-radius: 5px;
+        margin: 2px 0;
+      }
+
+      .rating-filter .cat-item:hover {
+        background-color: #fff3cd;
+        transform: translateX(5px);
+      }
+
+      .rating-filter .cat-item:hover .nav-link {
+        background-color: #ffc107;
+        color: #212529;
+      }
+
+      /* 搜索框悬停效果 */
+      .widget-search-bar .form-control:hover,
+      .widget-search-bar .form-control:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
+      }
+
+      /* 按钮悬停效果增强 */
+      .btn-cart:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 8px rgba(0,123,255,0.3);
+      }
+
+      .btn-outline-dark:hover {
+        transform: scale(1.1);
+      }
+    </style>
+
   </head>
   <body>
 <div id="app">
@@ -78,7 +158,12 @@
                 <a href="/web/chongzhi"  class="nav-link " title="充值">充值中心</a>
               </li>
               <li class="nav-item">
-                <a href="/web/personal"  class="nav-link " title="个人中心"><i class="fa fa-user"></i></a>
+                <a href="/web/personal" class="nav-link d-flex align-items-center" title="个人中心">
+                  <img v-if="userInfo && userInfo.img" :src="userInfo.img" alt="用户头像"
+                       style="width: 30px; height: 30px; border-radius: 50%; margin-right: 5px; border: 2px solid #007bff;">
+                  <i v-else class="fa fa-user"></i>
+                  <span v-if="userInfo && userInfo.username" style="margin-left: 5px;">{{userInfo.username}}</span>
+                </a>
               </li>
             </ul>
           </div>
@@ -369,6 +454,7 @@
         loading: true,
         userId: localStorage.getItem("userId"),
         role: localStorage.getItem("role"),
+        userInfo: {},
         form: {},
         open: false,
         openDetail: false,
@@ -390,6 +476,25 @@
       }
     },
     methods: {
+      // 获取用户信息
+      getUserInfo(){
+        let that = this
+        if (that.userId) {
+          $.ajax({
+            url: that.baseUrl + "/sysuser/detail",
+            type: "GET",
+            data: {id: that.userId},
+            success: function (data) {
+              if (data.code !== 500) {
+                that.userInfo = data.Data
+              }
+            },
+            error: function () {
+              console.log("获取用户信息失败")
+            }
+          });
+        }
+      },
       //添加购物车
       handleAddCart(id,number){
         let that = this
@@ -607,6 +712,7 @@
     watch: {},
     mounted() {
       let that = this;
+      that.getUserInfo()
       that.getproductTypeList()
       that.getList()
 

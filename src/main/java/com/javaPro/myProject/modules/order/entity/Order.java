@@ -46,5 +46,8 @@ public class Order implements Serializable {
     private String username;
     private String account;
     private List<Shopcart> cartList;
+
+    // 选中的购物车ID列表（前端传递）
+    private String selectedCartIds;
 }
 

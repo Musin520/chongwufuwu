@@ -11,7 +11,7 @@
         <result property="spare1" column="spare1" jdbcType="VARCHAR"/>
         <result property="spare2" column="spare2" jdbcType="VARCHAR"/>
         <association property="product" javaType="com.javaPro.myProject.modules.product.entity.Product">
-            <result property="id" column="id" jdbcType="INTEGER"/>
+            <result property="id" column="product_id" jdbcType="INTEGER"/>
             <result property="productname" column="productname" jdbcType="VARCHAR"/>
             <result property="productdes" column="productdes" jdbcType="VARCHAR"/>
             <result property="img" column="img" jdbcType="VARCHAR"/>
@@ -41,7 +41,7 @@
     <select id="queryProductByCartId" resultMap="ShopcartMap">
         select
           s.id, s.productid, s.userid, s.createtime, s.number,
-               p.id, p.productname, p.productdes, p.img, p.chengben, p.kedanjia, p.kucun, p.fahuotianshu, p.chandi, p.guige,
+               p.id as product_id, p.productname, p.productdes, p.img, p.chengben, p.kedanjia, p.kucun, p.fahuotianshu, p.chandi, p.guige,
                p.companyid,  p.status, p.producttype, p.spare1, p.spare2 as productspare2
         from shopcart s
         left join product p on p.id = s.productid
@@ -52,7 +52,7 @@
     <select id="queryAllByLimit" resultMap="ShopcartMap">
         select
           s.id, s.productid, userid, s.createtime, number, s.spare1,
-               s.spare2,p.id, p.productname, p.productdes, p.img, p.chengben, p.kedanjia,
+               s.spare2, p.id as product_id, p.productname, p.productdes, p.img, p.chengben, p.kedanjia,
                p.kucun, p.fahuotianshu, p.chandi, p.guige, p.companyid,
                p.status, p.updatetime, p.producttype,p.spare2 as productspare2
         from shopcart s

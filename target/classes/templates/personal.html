@@ -384,15 +384,31 @@
          </el-form>
      </el-dialog>
 
-     <el-dialog :title="title" :visible.sync="openMsg" width="50%">
+     <el-dialog :title="title" :visible.sync="openMsg" width="70%">
+         <!-- 消息历史记录 -->
+         <div class="message-history" style="max-height: 400px; overflow-y: auto; margin-bottom: 20px; border: 1px solid #dcdfe6; border-radius: 4px; padding: 15px;">
+             <h4 style="margin-bottom: 15px; color: #409eff;">消息历史记录</h4>
+             <div v-if="messageHistory.length === 0" style="text-align: center; color: #909399;">
+                 暂无历史消息
+             </div>
+             <div v-for="(msg, index) in messageHistory" :key="index" class="message-item"
+                  :style="{marginBottom: '15px', padding: '10px', borderRadius: '8px', backgroundColor: msg.senderid == userId ? '#e1f3d8' : '#f4f4f5'}">
+                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                     <span style="font-weight: bold; color: #303133;">
+                         {{msg.senderid == userId ? '我' : (msg.senderName || '管理员')}}
+                     </span>
+                     <span style="font-size: 12px; color: #909399;">{{msg.createtime}}</span>
+                 </div>
+                 <div style="color: #606266; line-height: 1.5;">{{msg.content}}</div>
+             </div>
+         </div>
+
          <el-form :model="form" :rules="rules" label-width="160px" ref="form">
-
-
-             <el-form-item label="消息" prop="content">
+             <el-form-item label="当前消息" prop="content">
                  <el-input type="textarea" disabled="" v-model="form.content"></el-input>
              </el-form-item>
              <el-form-item label="请输入你要回复的内容" prop="rescontent">
-                 <el-input type="textarea"  v-model="form.rescontent"></el-input>
+                 <el-input type="textarea" :rows="4" v-model="form.rescontent" placeholder="请输入回复内容..."></el-input>
              </el-form-item>
              <el-form-item>
                  <el-button @click="submitSend" type="primary">发送</el-button>
@@ -491,6 +507,7 @@
                  dataList: [],
                  orderList: [],
                  msgList: [],
+                messageHistory: [],
                  selectList: [],
                  likeList: [],
                  fileList: [],
@@ -529,7 +546,7 @@
                      pageSize: 3,
                      pageNum: 1,
                  }
-                 this.getList()
+                 this.getOrderList() // 重置查询参数后刷新订单列表
              },
 
              handleClick(tab){
@@ -589,6 +606,53 @@
                      }
                  });
              },
+            // 获取消息历史记录
+            getMessageHistory(senderId) {
+                let that = this;
+                $.ajax({
+                    url: that.baseUrl + "/message",
+                    type: "GET",
+                    data: {
+                        pageNum: 1,
+                        pageSize: 100,
+                        // 获取用户与指定发送者之间的所有消息
+                        senderid: senderId,
+                        receiveid: that.userId
+                    },
+                    success: function (data) {
+                        if (data.code !== 500) {
+                            let history = data.list || [];
+                            // 同时获取用户发送给该发送者的消息
+                            $.ajax({
+                                url: that.baseUrl + "/message",
+                                type: "GET",
+                                data: {
+                                    pageNum: 1,
+                                    pageSize: 100,
+                                    senderid: that.userId,
+                                    receiveid: senderId
+                                },
+                                success: function (data2) {
+                                    if (data2.code !== 500) {
+                                        let userMessages = data2.list || [];
+                                        // 合并两个消息列表并按时间排序
+                                        that.messageHistory = [...history, ...userMessages].sort((a, b) => {
+                                            return new Date(a.createtime) - new Date(b.createtime);
+                                        });
+                                    }
+                                },
+                                error: function () {
+                                    console.error("获取用户发送消息失败");
+                                }
+                            });
+                        }
+                    },
+                    error: function () {
+                        console.error("获取消息历史失败");
+                        that.messageHistory = [];
+                    }
+                });
+            },
              submitSend() {
                  let that = this
                  this.$refs['form'].validate((valid) => {
@@ -711,7 +775,7 @@
 
                                          toastr.error(data.msg, '提示')
                                      }
-                                     that.getList()
+                                     that.getUserInfo() // 刷新用户信息
                                  },
                                  error: function () {
                                      alert("服务器异常！network error！")
@@ -801,7 +865,9 @@
                  let that = this
                  that.form = row
                  that.openMsg = true
-                 that.title = "回复"
+                 that.title = "回复消息"
+                 // 获取与该发送者的消息历史
+                 that.getMessageHistory(row.senderid)
              },
 
 

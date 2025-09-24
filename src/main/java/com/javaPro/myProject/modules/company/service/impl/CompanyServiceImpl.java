@@ -54,6 +54,12 @@ public class CompanyServiceImpl implements CompanyService {
         return company;
     }
 
+    @Override
+    public Company insertWithId(Company company) {
+        this.companyDao.insertWithId(company);
+        return company;
+    }
+
     /**
      * 修改数据
      *

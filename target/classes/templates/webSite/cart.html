@@ -110,6 +110,9 @@
             <table class="table">
               <thead>
                 <tr>
+                  <th scope="col" class="card-title text-uppercase text-muted">
+                    <input type="checkbox" @change="selectAll" v-model="allSelected"> 全选
+                  </th>
                   <th scope="col" class="card-title text-uppercase text-muted">宠物服务图</th>
                   <th scope="col" class="card-title text-uppercase text-muted">数量</th>
                   <th scope="col" class="card-title text-uppercase text-muted">单价</th>
@@ -118,7 +121,9 @@
               </thead>
               <tbody>
                 <tr v-for="item in dataList">
-
+                  <td class="py-4 text-center">
+                    <input type="checkbox" v-model="item.selected" @change="updateSelection">
+                  </td>
                   <td scope="row" class="py-4">
                     <div class="cart-info d-flex flex-wrap align-items-center mb-4">
                       <div class="col-lg-3">
@@ -202,13 +207,29 @@
                 </tbody>
               </table>
             </div>
+            <div class="cart-summary mb-3">
+              <div class="row">
+                <div class="col-md-6">
+                  <h5>已选择商品：{{selectedCount}} 件</h5>
+                  <h5>总价：￥{{selectedTotal}}</h5>
+                </div>
+                <div class="col-md-6 text-end">
+                  <h5>优惠后总价：￥{{selectedDiscountTotal}}</h5>
+                </div>
+              </div>
+            </div>
             <div class="button-wrap row g-2">
 
               <div class="col-md-6">
                 <button
-                        v-if="dataList.length >0"
+                        v-if="selectedItems.length > 0"
                   class="btn btn-primary py-3 px-4 text-uppercase btn-rounded-none w-100"
-                  @click="erweima">一键购买</button></div>
+                  @click="erweima">购买选中商品 ({{selectedCount}}件)</button>
+                <button
+                        v-else
+                  class="btn btn-secondary py-3 px-4 text-uppercase btn-rounded-none w-100"
+                  disabled>请选择要购买的商品</button>
+              </div>
 
             </div>
           </div>
@@ -358,6 +379,7 @@
         loading: true,
         userId: localStorage.getItem("userId"),
         role: localStorage.getItem("role"),
+        allSelected: false,
         form: {},
         open: false,
         openDetail: false,
@@ -378,7 +400,38 @@
         }
       }
     },
+    computed: {
+      selectedItems() {
+        return this.dataList.filter(item => item.selected);
+      },
+      selectedCount() {
+        return this.selectedItems.length;
+      },
+      selectedTotal() {
+        return this.selectedItems.reduce((total, item) => {
+          return total + (parseFloat(item.product.kedanjia || 0) * parseInt(item.number || 0));
+        }, 0).toFixed(2);
+      },
+      selectedDiscountTotal() {
+        return this.selectedItems.reduce((total, item) => {
+          const price = parseFloat(item.product.kedanjia || 0);
+          const discount = parseFloat(item.product.spare2 || 10);
+          const quantity = parseInt(item.number || 0);
+          return total + (price * discount / 10 * quantity);
+        }, 0).toFixed(2);
+      }
+    },
     methods: {
+      // 全选/取消全选
+      selectAll() {
+        this.dataList.forEach(item => {
+          item.selected = this.allSelected;
+        });
+      },
+      // 更新选择状态
+      updateSelection() {
+        this.allSelected = this.dataList.length > 0 && this.dataList.every(item => item.selected);
+      },
 
       getproductTypeList() {
         let that = this;
@@ -415,6 +468,10 @@
             if (data.code !== 500) {
               that.loading = false
               that.dataList = data.list
+              // 为每个商品添加选中状态
+              that.dataList && that.dataList.forEach((el, index)=>{
+                that.$set(el, 'selected', false); // 使用Vue.set确保响应式
+              })
               let sum = 0
               let sumAfter = 0
               that.dataList && that.dataList.forEach((el)=>{
@@ -526,13 +583,20 @@
         })
       },
       erweima(){
+        if (this.selectedItems.length === 0) {
+          toastr.error("请选择要购买的商品", '提示')
+          return false
+        }
         this.qrcodeopen = true
       },
       handleOrder(){
         let that = this
         this.qrcodeopen = false
+        // 获取选中商品的ID
+        let selectedCartIds = this.selectedItems.map(item => item.id).join(',')
         let param = {
-          userid:that.userId,
+          userid: that.userId,
+          selectedCartIds: selectedCartIds
         }
         $.ajax({
           url: that.baseUrl + "/order",

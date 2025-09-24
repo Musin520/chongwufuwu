@@ -5,6 +5,8 @@ import com.javaPro.myProject.common.model.R;
 
 import com.javaPro.myProject.modules.sysuser.entity.Sysuser;
 import com.javaPro.myProject.modules.sysuser.service.SysuserService;
+import com.javaPro.myProject.modules.company.entity.Company;
+import com.javaPro.myProject.modules.company.service.CompanyService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +24,8 @@ public class LoginController {
     private static final Logger log = LoggerFactory.getLogger(LoginController.class);
     @Autowired
     SysuserService userService;
+    @Autowired
+    CompanyService companyService;
 
 
     @GetMapping({"/login"})// 跳转到登陆界面
@@ -87,6 +91,18 @@ public class LoginController {
             return R.fail("密码为空！");
         }
         Sysuser insert = userService.insert(user);
+
+        // 如果注册的是服务商，自动创建Company记录
+        if ("3".equals(param.getRole())) {
+            Company company = new Company();
+            company.setId(insert.getId()); // 使用用户ID作为Company的ID
+            company.setCompanyname(param.getUsername() + "的服务商店"); // 默认公司名称
+            company.setPhonenumber(param.getPhonenumber());
+            company.setCreateid(insert.getId());
+            company.setStatus("1"); // 默认状态为启用
+            companyService.insertWithId(company);
+        }
+
         return R.success("注册成功！");
     }
 

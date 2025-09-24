@@ -135,6 +135,12 @@ order by createtime desc
         values (#{companyname}, #{img}, #{yingyezhizhaohao}, #{faren}, #{phonenumber}, #{jingyingfanwei}, #{address}, #{zhuceshijian}, now(), now(), #{status}, #{createid})
     </insert>
 
+    <!--新增指定ID的记录-->
+    <insert id="insertWithId">
+        insert into company(id, companyname, img, yingyezhizhaohao, faren, phonenumber, jingyingfanwei, address, zhuceshijian, createtime, updatetime, status, createid)
+        values (#{id}, #{companyname}, #{img}, #{yingyezhizhaohao}, #{faren}, #{phonenumber}, #{jingyingfanwei}, #{address}, #{zhuceshijian}, now(), now(), #{status}, #{createid})
+    </insert>
+
     <insert id="insertBatch" keyProperty="id" useGeneratedKeys="true">
         insert into company(companyname, img, yingyezhizhaohao, faren, phonenumber, jingyingfanwei, address, zhuceshijian, createtime, updatetime, status, createid)
         values
