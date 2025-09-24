@@ -1,0 +1,12 @@
+spring:
+  main:
+    allow-circular-references: true
+
+oss:
+  endpoint: ${TEST_OSS_ENDPOINT:http://localhost:9000}
+  accessKeyId: ${TEST_ACCESS_KEY:testkey}
+  accessKeySecret: ${TEST_ACCESS_SECRET:testsecret}
+  bucketName: ${TEST_BUCKET:test-bucket}
+  urlPrefix: ${TEST_URL_PREFIX:http://localhost:9000/test-bucket/}
+
+# 移除profiles.active配置，因为这会在profile-specific文件中引起冲突
