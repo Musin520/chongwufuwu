@@ -43,14 +43,16 @@
      </div>
 
 
-     <header v-if="role == '2'">
+     <header v-if="role == '2' || role == '3'">
          <div class="container-fluid">
              <div class="row py-3 border-bottom">
 
                  <div class="col-sm-4 col-lg-2 text-center text-sm-start d-flex gap-3 justify-content-center justify-content-md-start">
                      <div class="d-flex align-items-center my-3 my-sm-0">
                          <a href="/web/userindex">
-                             <img alt="logo" class="img-fluid" src="/static/webSite/images/logo.png"
+                             <img v-if="userInfo && userInfo.img" :src="userInfo.img" alt="用户头像" class="img-fluid"
+                                  style="width: 50px;height: 50px; border-radius: 50%; border: 2px solid #007bff;">
+                             <img v-else alt="logo" class="img-fluid" src="/static/webSite/images/logo.png"
                                   style="width: 50px;height: 50px;">
                          </a>
                      </div>
@@ -74,11 +76,11 @@
                  </div>
 
                  <div class="col-md-8">
-                     <ul class="navbar-nav list-unstyled d-flex flex-row gap-3 gap-lg-5 justify-content-center flex-wrap align-items-center mb-0 fw-bold text-uppercase text-dark">
+                     <!-- 普通用户导航 -->
+                     <ul v-if="role == '2'" class="navbar-nav list-unstyled d-flex flex-row gap-3 gap-lg-5 justify-content-center flex-wrap align-items-center mb-0 fw-bold text-uppercase text-dark">
                          <li class="nav-item ">
                              <a class="nav-link" href="/web/userindex">主页</a>
                          </li>
-
                          <li class="nav-item">
                              <a class="nav-link  " href="/web/userproductlist">宠物服务列表</a>
                          </li>
@@ -92,7 +94,38 @@
                              <a class="nav-link " href="/web/userblog">网站资讯/公告</a>
                          </li>
                          <li class="nav-item text-primary" >
-                             <a class="nav-link " href="/web/personal" title="个人中心"><i class="fa fa-user"></i></a>
+                             <a class="nav-link d-flex align-items-center" href="/web/personal" title="个人中心">
+                                 <img v-if="userInfo && userInfo.img" :src="userInfo.img" alt="用户头像"
+                                      style="width: 30px; height: 30px; border-radius: 50%; margin-right: 5px; border: 2px solid #007bff;">
+                                 <i v-else class="fa fa-user"></i>
+                                 <span v-if="userInfo && userInfo.username" style="margin-left: 5px;">{{userInfo.username}}</span>
+                             </a>
+                         </li>
+                     </ul>
+
+                     <!-- 服务商导航 -->
+                     <ul v-if="role == '3'" class="navbar-nav list-unstyled d-flex flex-row gap-3 gap-lg-5 justify-content-center flex-wrap align-items-center mb-0 fw-bold text-uppercase text-dark">
+                         <li class="nav-item">
+                             <a class="nav-link  " href="/web/product">我的服务</a>
+                         </li>
+                         <li class="nav-item">
+                             <a class="nav-link" href="/web/provider/dashboard" target="_blank">
+                                 <i class="fa fa-bar-chart"></i> 数据统计
+                             </a>
+                         </li>
+                         <li class="nav-item">
+                             <a class="nav-link " href="/web/order">订单管理</a>
+                         </li>
+                         <li class="nav-item">
+                             <a class="nav-link " href="/web/message">消息中心</a>
+                         </li>
+                         <li class="nav-item text-primary" >
+                             <a class="nav-link d-flex align-items-center" href="/web/personal" title="个人中心">
+                                 <img v-if="userInfo && userInfo.img" :src="userInfo.img" alt="用户头像"
+                                      style="width: 30px; height: 30px; border-radius: 50%; margin-right: 5px; border: 2px solid #007bff;">
+                                 <i v-else class="fa fa-user"></i>
+                                 <span v-if="userInfo && userInfo.username" style="margin-left: 5px;">{{userInfo.username}}</span>
+                             </a>
                          </li>
                      </ul>
                  </div>
@@ -103,8 +136,26 @@
      </header>
      <el-card class="box-card">
      <el-tabs stretch v-model="activeName" @tab-click="handleClick">
-         <el-tab-pane label="用户信息" name="first">
-             <el-descriptions :column="4" title="用户信息" border>
+         <el-tab-pane :label="role == '1' ? '管理员信息' : (role == '2' ? '用户信息' : '服务商信息')" name="first">
+             <!-- 管理员信息 -->
+             <el-descriptions v-if="role == '1'" :column="4" title="管理员信息" border>
+                 <el-descriptions-item :span="4" label="头像">
+                     <el-image :src="userInfo.img || '/static/webSite/images/default-avatar.png'"
+                               style="width: 100px;height: 100px;"></el-image>
+                 </el-descriptions-item>
+                 <el-descriptions-item :span="2" label="管理员姓名">{{userInfo.username}}</el-descriptions-item>
+                 <el-descriptions-item :span="2" label="性别">{{userInfo.sex}}</el-descriptions-item>
+                 <el-descriptions-item :span="2" label="联系方式">{{userInfo.phonenumber}}</el-descriptions-item>
+                 <el-descriptions-item :span="2" label="账号">{{userInfo.account}}</el-descriptions-item>
+                 <el-descriptions-item :span="2" label="证件号">{{userInfo.idcard}}</el-descriptions-item>
+                 <el-descriptions-item :span="2" label="年龄">{{userInfo.age}}</el-descriptions-item>
+                 <el-descriptions-item :span="4" label="地址">{{userInfo.address}}</el-descriptions-item>
+                 <el-descriptions-item :span="2" label="角色">系统管理员</el-descriptions-item>
+                 <el-descriptions-item :span="2" label="权限">系统管理权限</el-descriptions-item>
+             </el-descriptions>
+
+             <!-- 普通用户信息 -->
+             <el-descriptions v-if="role == '2'" :column="4" title="用户信息" border>
                  <el-descriptions-item :span="4" label="图片">
                      <el-image :src="userInfo.img"
                                style="width: 100px;height: 100px;"></el-image>
@@ -125,11 +176,38 @@
                  <el-descriptions-item :span="4" label="宠物品种">{{userInfo.pettype}}</el-descriptions-item>
                  <el-descriptions-item :span="4" label="宠物描述">{{userInfo.petdes}}</el-descriptions-item>
              </el-descriptions>
-             <div style="width: 100%;text-align: center;margin-top: 50px">
-                 <el-button type="danger" v-if="role == '2'" @click="handleLogout">退出登录</el-button>
-                 <el-button type="warning" @click="handleEditUserInfo">修改信息</el-button>
-                 <el-button type="primary" v-if="role == '2'" @click="goToChongzhi">充值中心</el-button>
 
+             <!-- 服务商信息 -->
+             <div v-if="role == '3'">
+                 <el-descriptions :column="4" title="基本信息" border style="margin-bottom: 20px;">
+                     <el-descriptions-item :span="4" label="头像">
+                         <el-image :src="userInfo.img"
+                                   style="width: 100px;height: 100px;"></el-image>
+                     </el-descriptions-item>
+                     <el-descriptions-item :span="2" label="姓名">{{userInfo.username}}</el-descriptions-item>
+                     <el-descriptions-item :span="2" label="性别">{{userInfo.sex}}</el-descriptions-item>
+                     <el-descriptions-item :span="2" label="联系方式">{{userInfo.phonenumber}}</el-descriptions-item>
+                     <el-descriptions-item :span="2" label="账号">{{userInfo.account}}</el-descriptions-item>
+                     <el-descriptions-item :span="2" label="证件号">{{userInfo.idcard}}</el-descriptions-item>
+                     <el-descriptions-item :span="2" label="创建时间">{{userInfo.createtime}}</el-descriptions-item>
+                 </el-descriptions>
+
+                 <el-descriptions :column="4" title="服务商信息" border>
+                     <el-descriptions-item :span="2" label="联系方式">{{companyInfo.phonenumber || '未设置'}}</el-descriptions-item>
+                     <el-descriptions-item :span="2" label="注册地址">{{companyInfo.address || '未设置'}}</el-descriptions-item>
+                     <el-descriptions-item :span="2" label="注册时间">{{companyInfo.zhuceshijian || '未设置'}}</el-descriptions-item>
+                     <el-descriptions-item :span="2" label="服务区域">{{companyInfo.serviceArea || '未设置'}}</el-descriptions-item>
+                     <el-descriptions-item :span="2" label="平均评分">{{companyInfo.avgRating || '暂无评分'}}</el-descriptions-item>
+                     <el-descriptions-item :span="2" label="评价总数">{{companyInfo.ratingCount || 0}}</el-descriptions-item>
+                 </el-descriptions>
+             </div>
+             <div style="width: 100%;text-align: center;margin-top: 50px">
+                 <el-button type="danger" @click="handleLogout">退出登录</el-button>
+                 <el-button type="warning" v-if="role == '1'" @click="handleEditAdminInfo">修改管理员信息</el-button>
+                 <el-button type="primary" v-if="role == '1'" @click="goToAdminPanel">管理后台</el-button>
+                 <el-button type="warning" v-if="role == '2'" @click="handleEditUserInfo">修改信息</el-button>
+                 <el-button type="primary" v-if="role == '2'" @click="goToChongzhi">充值中心</el-button>
+                 <el-button type="success" v-if="role == '3'" @click="handleEditCompanyInfo">修改服务商信息</el-button>
              </div>
          </el-tab-pane>
          <el-tab-pane label="我的收藏" v-if="role == '2'" name="second">
@@ -276,6 +354,11 @@
                                  align="center"
                                  label="发送人"
                                  prop="senderName">
+                             <template slot-scope="scope">
+                                 <span>{{scope.row.senderName}}</span>
+                                 <el-tag size="mini" v-if="scope.row.senderRole == '3'" type="success">服务商</el-tag>
+                                 <el-tag size="mini" v-if="scope.row.senderRole == '1'" type="warning">管理员</el-tag>
+                             </template>
                          </el-table-column>
                          <el-table-column
                                  align="center"
@@ -302,7 +385,9 @@
                                  width="350px"
                          >
                              <template slot-scope="scope">
-
+                                 <el-button @click="handleChat(scope.row)" round size="small" type="primary">
+                                     <i class="fa fa-comments"></i> 聊天
+                                 </el-button>
                                  <el-button @click="handleEdit(scope.row)" round size="small" type="warning">
                                      <i class="fa fa-pencil"></i> 回复
                                  </el-button>
@@ -364,19 +449,49 @@
              <el-form-item label="个人备注">
                  <el-input type="textarea" v-model="form.remark"></el-input>
              </el-form-item>
-<div style="width: 100%;height: 5px;background: #e5e5e5;margin-bottom: 5px"></div>
-             <el-form-item label="宠物名">
-                 <el-input v-model="form.petname"></el-input>
-             </el-form-item>
-             <el-form-item label="宠物年龄">
-                 <el-input v-model="form.petage"></el-input>
-             </el-form-item>
-             <el-form-item label="宠物品种">
-                 <el-input v-model="form.pettype"></el-input>
-             </el-form-item>
-             <el-form-item label="宠物描述">
-                 <el-input type="textarea" v-model="form.petdes"></el-input>
-             </el-form-item>
+
+             <!-- 普通用户的宠物信息 -->
+             <div v-if="role == '2'">
+                 <div style="width: 100%;height: 5px;background: #e5e5e5;margin-bottom: 5px"></div>
+                 <el-form-item label="宠物名">
+                     <el-input v-model="form.petname"></el-input>
+                 </el-form-item>
+                 <el-form-item label="宠物年龄">
+                     <el-input v-model="form.petage"></el-input>
+                 </el-form-item>
+                 <el-form-item label="宠物品种">
+                     <el-input v-model="form.pettype"></el-input>
+                 </el-form-item>
+                 <el-form-item label="宠物描述">
+                     <el-input type="textarea" v-model="form.petdes"></el-input>
+                 </el-form-item>
+             </div>
+
+             <!-- 服务商的公司信息 -->
+             <div v-if="role == '3'">
+                 <div style="width: 100%;height: 5px;background: #e5e5e5;margin-bottom: 5px"></div>
+                 <el-form-item label="公司名称">
+                     <el-input v-model="form.companyname"></el-input>
+                 </el-form-item>
+                 <el-form-item label="法人">
+                     <el-input v-model="form.faren"></el-input>
+                 </el-form-item>
+                 <el-form-item label="营业执照号">
+                     <el-input v-model="form.yingyezhizhaohao"></el-input>
+                 </el-form-item>
+                 <el-form-item label="经营范围">
+                     <el-input type="textarea" v-model="form.jingyingfanwei"></el-input>
+                 </el-form-item>
+                 <el-form-item label="注册地址">
+                     <el-input v-model="form.address"></el-input>
+                 </el-form-item>
+                 <el-form-item label="注册时间">
+                     <el-input v-model="form.zhuceshijian"></el-input>
+                 </el-form-item>
+                 <el-form-item label="服务区域">
+                     <el-input v-model="form.serviceArea"></el-input>
+                 </el-form-item>
+             </div>
              <el-form-item>
                  <el-button @click="submitEdit" type="primary">保存</el-button>
                  <el-button @click="open = false">取消</el-button>
@@ -417,15 +532,105 @@
          </el-form>
      </el-dialog>
 
+     <!-- 聊天对话框 -->
+     <el-dialog title="聊天对话" :visible.sync="chatVisible" width="60%" :before-close="handleChatClose">
+         <div class="chat-container" style="height: 500px; display: flex; flex-direction: column;">
+             <!-- 聊天头部信息 -->
+             <div class="chat-header" style="padding: 10px; border-bottom: 1px solid #ebeef5; background: #f5f7fa;">
+                 <div style="display: flex; align-items: center; gap: 10px;">
+                     <i class="fa fa-user-circle" style="font-size: 24px; color: #409eff;"></i>
+                     <div>
+                         <div style="font-weight: bold;">{{chatPartner.name}}</div>
+                         <div style="font-size: 12px; color: #909399;">
+                             {{chatPartner.role == '3' ? '服务商' : (chatPartner.role == '1' ? '管理员' : '用户')}}
+                         </div>
+                     </div>
+                 </div>
+             </div>
+
+             <!-- 聊天消息区域 -->
+             <div class="chat-messages" ref="chatMessages" style="flex: 1; overflow-y: auto; padding: 15px; background: #fff;">
+                 <div v-if="chatMessages.length === 0" style="text-align: center; color: #909399; margin-top: 50px;">
+                     <i class="fa fa-comments-o" style="font-size: 48px; margin-bottom: 10px;"></i>
+                     <div>开始你们的对话吧</div>
+                 </div>
+
+                 <div v-for="msg in chatMessages" :key="msg.id" class="message-item"
+                      :style="{marginBottom: '15px', display: 'flex', justifyContent: msg.senderId == userId ? 'flex-end' : 'flex-start'}">
+                     <div :style="{
+                         maxWidth: '70%',
+                         padding: '10px 15px',
+                         borderRadius: '18px',
+                         backgroundColor: msg.senderId == userId ? '#409eff' : '#f0f0f0',
+                         color: msg.senderId == userId ? '#fff' : '#333'
+                     }">
+                         <div>{{msg.content}}</div>
+                         <div :style="{
+                             fontSize: '12px',
+                             marginTop: '5px',
+                             opacity: '0.8'
+                         }">
+                             {{formatTime(msg.createtime)}}
+                         </div>
+                     </div>
+                 </div>
+             </div>
+
+             <!-- 消息输入区域 -->
+             <div class="chat-input" style="padding: 15px; border-top: 1px solid #ebeef5; background: #fafafa;">
+                 <div style="display: flex; gap: 10px;">
+                     <el-input
+                         v-model="newMessage"
+                         placeholder="输入消息..."
+                         @keyup.enter.native="sendMessage"
+                         :maxlength="500"
+                         show-word-limit
+                         style="flex: 1;">
+                     </el-input>
+                     <el-button type="primary" @click="sendMessage" :disabled="!newMessage.trim()">
+                         <i class="fa fa-send"></i> 发送
+                     </el-button>
+                 </div>
+             </div>
+         </div>
+     </el-dialog>
+
      <el-dialog :title="title" :visible.sync="evaluteOpen" width="50%">
          <el-form :model="form" :rules="rules" label-width="160px" ref="form">
 
+             <el-form-item label="服务评分" prop="rating">
+                 <div style="display: flex; align-items: center; gap: 15px;">
+                     <el-rate
+                         v-model="form.rating"
+                         :max="5"
+                         allow-half
+                         show-text
+                         :texts="['极差', '失望', '一般', '满意', '惊喜']"
+                         :colors="['#F7BA2A', '#F7BA2A', '#F7BA2A']"
+                         :disabled-void-color="'#C6D1DE'"
+                         :void-color="'#C6D1DE'"
+                         :text-color="'#1F2D3D'"
+                         @change="onRatingChange"
+                         @click.native="handleRatingClick">
+                     </el-rate>
+                     <div style="display: flex; align-items: center; gap: 8px; min-width: 60px;">
+                         <span style="color: #409EFF; font-size: 18px; font-weight: bold;">
+                             {{ formatRatingDisplay(form.rating) }}
+                         </span>
+                         <span style="color: #606266; font-size: 14px;">分</span>
+                     </div>
+                 </div>
+                 <div style="margin-top: 8px; color: #909399; font-size: 12px;">
+                     请点击星星为服务商的服务质量打分（点击固定星数，半颗星=0.5分，一颗星=1分）
+                 </div>
+             </el-form-item>
+
              <el-form-item label="填写你的评价" prop="content">
-                 <el-input type="textarea"  v-model="form.content"></el-input>
+                 <el-input type="textarea" :rows="4" placeholder="请详细描述您对本次服务的感受和建议..." v-model="form.content" maxlength="200" show-word-limit></el-input>
              </el-form-item>
 
              <el-form-item>
-                 <el-button @click="handleEvaluteSubmit" type="primary">确定评价</el-button>
+                 <el-button @click="handleEvaluteSubmit" type="primary" :disabled="!form.rating || form.rating < 0.5">确定评价</el-button>
                  <el-button @click="evaluteOpen = false">取消</el-button>
              </el-form-item>
          </el-form>
@@ -513,6 +718,7 @@
                  fileList: [],
                  fileStr: [],
                  userInfo: {},
+                 companyInfo: {},
                  total: 0,
                  searchKey: "",
                  activeName: "first",
@@ -526,6 +732,15 @@
                  evaluteOpen: false,
                  orderDetailVisible: false,
                  currentOrder: null,
+                 // 聊天相关
+                 chatVisible: false,
+                 chatPartner: {
+                     id: null,
+                     name: '',
+                     role: ''
+                 },
+                 chatMessages: [],
+                 newMessage: '',
                  queryParams: {
                      pageSize: 3,
                      pageNum: 1,
@@ -534,9 +749,15 @@
                  rules: {
                      title: [
                          {required: true, message: '请输入', trigger: 'blur'},
-
                      ],
-
+                     rating: [
+                         {required: true, message: '请选择评分', trigger: 'change'},
+                         {type: 'number', min: 0.5, max: 5, message: '评分必须在0.5-5分之间', trigger: 'change'}
+                     ],
+                     content: [
+                         {required: true, message: '请输入评价内容', trigger: 'blur'},
+                         {min: 5, max: 200, message: '评价内容长度在5到200个字符', trigger: 'blur'}
+                     ]
                  }
              }
          },
@@ -719,13 +940,32 @@
                      data: {id:that.userId},
                      success: function (data) {
                          if (data.code !== 500) {
-
                              that.userInfo = data.Data
-
+                             // 如果是服务商，获取服务商信息
+                             if (that.role === '3') {
+                                 that.getCompanyInfo()
+                             }
                          }
                      },
                      error: function () {
                          windowsAuto(500, "服务器异常！network error！")
+                     }
+                 });
+             },
+             getCompanyInfo(){
+                 let that = this
+                 $.ajax({
+                     url: that.baseUrl + "/company/byCreateId",
+                     type: "GET",
+                     data: {createid: that.userId},
+                     success: function (data) {
+                         if (data.code !== 500) {
+                             that.companyInfo = data.Data || {}
+                         }
+                     },
+                     error: function () {
+                         console.error("获取服务商信息失败")
+                         that.companyInfo = {}
                      }
                  });
              },
@@ -760,27 +1000,66 @@
                          if (that.fileStr && that.fileStr.length > 0) {
                              that.form.img = that.fileStr.join(",")
                          }
-                             $.ajax({
-                                 url: that.baseUrl + "/sysuser",
-                                 type: "PUT",
-                                 data: JSON.stringify(that.form),
-                                 contentType: "application/json",
-                                 // headers: { 'Content-Type': 'application/json;charset=utf-8' },
-                                 success: function (data) {
-                                     that.open = false
-                                     if (data.code === 200) {
-                                         toastr.success(data.msg, '提示')
 
+                         // 更新用户基本信息
+                         $.ajax({
+                             url: that.baseUrl + "/sysuser",
+                             type: "PUT",
+                             data: JSON.stringify(that.form),
+                             contentType: "application/json",
+                             success: function (data) {
+                                 if (data.code === 200) {
+                                     // 如果是服务商，还需要更新服务商信息
+                                     if (that.role === '3') {
+                                         that.updateCompanyInfo()
                                      } else {
-
-                                         toastr.error(data.msg, '提示')
+                                         that.open = false
+                                         toastr.success(data.msg, '提示')
+                                         that.getUserInfo() // 刷新用户信息
                                      }
-                                     that.getUserInfo() // 刷新用户信息
-                                 },
-                                 error: function () {
-                                     alert("服务器异常！network error！")
+                                 } else {
+                                     toastr.error(data.msg, '提示')
                                  }
-                             })
+                             },
+                             error: function () {
+                                 alert("服务器异常！network error！")
+                             }
+                         })
+                     }
+                 })
+             },
+             updateCompanyInfo() {
+                 let that = this
+                 // 准备服务商信息数据
+                 let companyData = {
+                     id: that.companyInfo.id,
+                     companyname: that.form.companyname,
+                     faren: that.form.faren,
+                     yingyezhizhaohao: that.form.yingyezhizhaohao,
+                     jingyingfanwei: that.form.jingyingfanwei,
+                     address: that.form.address,
+                     zhuceshijian: that.form.zhuceshijian,
+                     serviceArea: that.form.serviceArea,
+                     createid: that.userId
+                 }
+
+                 $.ajax({
+                     url: that.baseUrl + "/company",
+                     type: companyData.id ? "PUT" : "POST",
+                     data: JSON.stringify(companyData),
+                     contentType: "application/json",
+                     success: function (data) {
+                         that.open = false
+                         if (data.code === 200) {
+                             toastr.success("信息更新成功", '提示')
+                             that.getUserInfo() // 刷新用户信息
+                             that.getCompanyInfo() // 刷新服务商信息
+                         } else {
+                             toastr.error(data.msg, '提示')
+                         }
+                     },
+                     error: function () {
+                         alert("更新服务商信息失败！")
                      }
                  })
              },
@@ -861,6 +1140,24 @@
                  that.open = true
                  that.title = "编辑"
              },
+             handleEditCompanyInfo() {
+                 let that = this
+                 that.form = Object.assign({}, that.userInfo, that.companyInfo)
+                 that.open = true
+                 that.title = "编辑服务商信息"
+             },
+
+             // 管理员相关方法
+             handleEditAdminInfo() {
+                 let that = this
+                 that.form = Object.assign({}, that.userInfo)
+                 that.open = true
+                 that.title = "编辑管理员信息"
+             },
+
+             goToAdminPanel() {
+                 window.open('/web/index', '_blank')
+             },
              handleEdit(row) {
                  let that = this
                  that.form = row
@@ -876,6 +1173,99 @@
              },
              handleRemove(file, fileList) {
                  this.fileStr = this.removeElement(this.fileStr, file.response.msg)
+             },
+
+             // 聊天相关方法
+             handleChat(row) {
+                 this.chatPartner = {
+                     id: row.senderid,
+                     name: row.senderName,
+                     role: row.senderRole || '2'
+                 };
+                 this.chatVisible = true;
+                 this.loadChatMessages();
+             },
+
+             loadChatMessages() {
+                 let that = this;
+                 $.ajax({
+                     url: that.baseUrl + "/message/chat",
+                     type: "GET",
+                     data: {
+                         userId: that.userId,
+                         partnerId: that.chatPartner.id
+                     },
+                     success: function (data) {
+                         if (data.code === 200) {
+                             that.chatMessages = data.list || [];
+                             that.$nextTick(() => {
+                                 that.scrollToBottom();
+                             });
+                         }
+                     },
+                     error: function () {
+                         toastr.error("加载聊天记录失败", '提示');
+                     }
+                 });
+             },
+
+             sendMessage() {
+                 let that = this;
+                 if (!that.newMessage.trim()) {
+                     return;
+                 }
+
+                 $.ajax({
+                     url: that.baseUrl + "/message/form",
+                     type: "POST",
+                     data: {
+                         content: that.newMessage,
+                         senderid: that.userId,
+                         receiveid: that.chatPartner.id,
+                         status: "0"
+                     },
+                     success: function (data) {
+                         if (data.code === 200) {
+                             that.newMessage = '';
+                             that.loadChatMessages(); // 重新加载消息
+                             toastr.success("消息发送成功", '提示');
+                         } else {
+                             toastr.error(data.msg || "发送失败", '提示');
+                         }
+                     },
+                     error: function () {
+                         toastr.error("发送消息失败", '提示');
+                     }
+                 });
+             },
+
+             handleChatClose() {
+                 this.chatVisible = false;
+                 this.chatMessages = [];
+                 this.newMessage = '';
+             },
+
+             scrollToBottom() {
+                 if (this.$refs.chatMessages) {
+                     this.$refs.chatMessages.scrollTop = this.$refs.chatMessages.scrollHeight;
+                 }
+             },
+
+             formatTime(time) {
+                 if (!time) return '';
+                 const date = new Date(time);
+                 const now = new Date();
+                 const diff = now - date;
+
+                 if (diff < 60000) { // 1分钟内
+                     return '刚刚';
+                 } else if (diff < 3600000) { // 1小时内
+                     return Math.floor(diff / 60000) + '分钟前';
+                 } else if (diff < 86400000) { // 24小时内
+                     return Math.floor(diff / 3600000) + '小时前';
+                 } else {
+                     return date.toLocaleDateString() + ' ' + date.toLocaleTimeString().slice(0, 5);
+                 }
              },
 
              beforeRemove(file, fileList) {
@@ -910,25 +1300,118 @@
                  that.evaluteOpen = true
                  that.title = "评价"
                  that.form = JSON.parse(JSON.stringify(row))
+                 // 初始化评分为0.5分（半颗星），最低评分
+                 that.form.rating = 0.5
+                 that.form.content = ''
+             },
+
+             // 评分变化处理（星星点击）
+             onRatingChange(value) {
+                 // 确保评分值正确更新，并且不能为0
+                 if (value === 0) {
+                     this.form.rating = 0.5;
+                 } else {
+                     // 确保是0.5的倍数，实现半颗星=0.5分，一颗星=1分
+                     let rounded = Math.round(value * 2) / 2;
+                     this.form.rating = Math.max(0.5, Math.min(5, rounded));
+                 }
+
+                 // 强制更新组件显示，确保星星固定在点击位置
+                 this.$nextTick(() => {
+                     this.$forceUpdate();
+                 });
+
+                 console.log('当前评分：' + this.form.rating + '分 (' + this.getStarDescription(this.form.rating) + ')');
+             },
+
+             // 处理星星点击事件，确保点击固定
+             handleRatingClick(event) {
+                 // 阻止事件冒泡，确保点击行为正确
+                 event.stopPropagation();
+             },
+
+             // 格式化评分显示
+             formatRatingDisplay(rating) {
+                 if (!rating || rating === 0) {
+                     return '0';
+                 }
+                 // 如果是整数，显示整数；如果是小数，显示一位小数
+                 return rating % 1 === 0 ? rating.toString() : rating.toFixed(1);
+             },
+
+             // 获取星数描述
+             getStarDescription(rating) {
+                 if (!rating) return '未评分';
+                 const fullStars = Math.floor(rating);
+                 const hasHalfStar = rating % 1 !== 0;
+
+                 let description = '';
+                 if (fullStars > 0) {
+                     description += fullStars + '颗星';
+                 }
+                 if (hasHalfStar) {
+                     description += (fullStars > 0 ? '半' : '半颗星');
+                 }
+                 return description;
              },
              handleEvaluteSubmit(){
                  let that = this
+
+                 // 验证评分
+                 if (!that.form.rating || that.form.rating < 0.5) {
+                     toastr.error("请点击星星进行评分", '提示');
+                     return;
+                 }
+
+                 if (!that.form.content || !that.form.content.trim()) {
+                     toastr.error("请输入评价内容", '提示');
+                     return;
+                 }
+
                  $.ajax({
                      url: that.baseUrl + "/orderEvalute",
                      type: "post",
                      data: {
                          orderid: that.form.id,
                          content: that.form.content,
+                         rating: that.form.rating,
                          userid: that.userId,
                          companyid: that.form.companyid,
                      },
                      success: function (data) {
-                         windowsAuto(data.code, data.msg)
-                         that.getOrderList()
-                         that.evaluteOpen = false
+                         if (data.code === 200) {
+                             toastr.success("评价提交成功", '提示');
+                             that.getOrderList()
+                             that.evaluteOpen = false
+
+                             // 如果评价成功且有评分统计信息，通知其他页面更新
+                             if (data.avgRating !== undefined && data.companyid) {
+                                 // 使用localStorage存储评分更新事件
+                                 const ratingUpdateEvent = {
+                                     companyid: data.companyid,
+                                     avgRating: data.avgRating,
+                                     ratingCount: data.ratingCount,
+                                     timestamp: new Date().getTime()
+                                 };
+                                 localStorage.setItem('ratingUpdate', JSON.stringify(ratingUpdateEvent));
+
+                                 // 触发storage事件通知其他页面
+                                 window.dispatchEvent(new StorageEvent('storage', {
+                                     key: 'ratingUpdate',
+                                     newValue: JSON.stringify(ratingUpdateEvent)
+                                 }));
+
+                                 // 触发同页面内的评分更新事件
+                                 window.dispatchEvent(new CustomEvent('ratingUpdated', {
+                                     detail: ratingUpdateEvent
+                                 }));
+                             }
+                         } else {
+                             toastr.error(data.msg || "评价提交失败", '提示');
+                         }
                      },
                      error: function () {
-                         alert("服务器异常！network error！")
+                         toastr.error("服务器异常！network error！", '提示');
                      }
                  })
              },

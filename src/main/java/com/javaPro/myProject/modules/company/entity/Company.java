@@ -13,29 +13,9 @@ public class Company implements Serializable {
 
     private Integer id;
     /**
-     * 销售商名称
-     */
-    private String companyname;
-    /**
-     * 执照照片
-     */
-    private String img;
-    /**
-     * 营业执照统一信贷码
-     */
-    private String yingyezhizhaohao;
-    /**
-     * 法人
-     */
-    private String faren;
-    /**
      * 手机号
      */
     private String phonenumber;
-    /**
-     * 经营范围
-     */
-    private String jingyingfanwei;
     /**
      * 注册地址
      */
@@ -81,6 +61,11 @@ public class Company implements Serializable {
      */
     private String serviceArea;
 
+    /**
+     * 服务商用户名（用于显示，不存储在数据库中）
+     */
+    private String username;
+
 
 
 
@@ -92,52 +77,12 @@ public class Company implements Serializable {
         this.id = id;
     }
 
-    public String getCompanyname() {
-        return companyname;
-    }
-
-    public void setCompanyname(String companyname) {
-        this.companyname = companyname;
-    }
-
-    public String getImg() {
-        return img;
-    }
-
-    public void setImg(String img) {
-        this.img = img;
-    }
-
-    public String getYingyezhizhaohao() {
-        return yingyezhizhaohao;
-    }
-
-    public void setYingyezhizhaohao(String yingyezhizhaohao) {
-        this.yingyezhizhaohao = yingyezhizhaohao;
-    }
-
-    public String getFaren() {
-        return faren;
-    }
-
-    public void setFaren(String faren) {
-        this.faren = faren;
-    }
-
     public String getPhonenumber() {
         return phonenumber;
     }
 
     public void setPhonenumber(String phonenumber) {
         this.phonenumber = phonenumber;
-    }
-
-    public String getJingyingfanwei() {
-        return jingyingfanwei;
-    }
-
-    public void setJingyingfanwei(String jingyingfanwei) {
-        this.jingyingfanwei = jingyingfanwei;
     }
 
     public String getAddress() {
@@ -218,6 +163,14 @@ public class Company implements Serializable {
 
     public void setServiceArea(String serviceArea) {
         this.serviceArea = serviceArea;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 }
 

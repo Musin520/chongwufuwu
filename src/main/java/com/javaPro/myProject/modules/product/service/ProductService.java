@@ -52,4 +52,11 @@ public interface ProductService {
      */
     boolean deleteById(Integer id);
 
+    /**
+     * 更新产品服务时间段数据（用于测试）
+     *
+     * @return 更新的记录数
+     */
+    int updateServiceTimeForTesting();
+
 }

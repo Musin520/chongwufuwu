@@ -12,6 +12,8 @@
         <result property="status" column="status" jdbcType="VARCHAR"/>
         <result property="senderName" column="senderName" jdbcType="VARCHAR"/>
         <result property="receiverName" column="receiverName" jdbcType="VARCHAR"/>
+        <result property="senderRole" column="senderRole" jdbcType="VARCHAR"/>
+        <result property="receiverRole" column="receiverRole" jdbcType="VARCHAR"/>
     </resultMap>
 
     <!--查询单个-->
@@ -142,6 +144,22 @@ order by createtime desc
     <delete id="deleteById">
         delete from message where id = #{id}
     </delete>
+
+    <!--获取聊天记录-->
+    <select id="getChatMessages" resultMap="MessageMap">
+        select
+            m.id, content, m.createtime, updatetime, senderid, receiveid, status,
+            s.username as senderName, s.role as senderRole,
+            r.username as receiverName, r.role as receiverRole
+        from message m
+        left join sysuser s on s.id = m.senderid
+        left join sysuser r on r.id = m.receiveid
+        where
+            (m.senderid = #{userId} and m.receiveid = #{partnerId})
+            or
+            (m.senderid = #{partnerId} and m.receiveid = #{userId})
+        order by m.createtime asc
+    </select>
 
 </mapper>
 

@@ -103,6 +103,27 @@
             <if test="spare2 != null and spare2 != ''">
                 and spare2 = #{spare2}
             </if>
+            <!-- 时间段筛选 - 修改逻辑让全天服务也能在各时间段显示 -->
+            <if test="serviceStartTime != null and serviceStartTime != '' and serviceEndTime != null and serviceEndTime != ''">
+                and (
+                    <!-- 服务时间段与筛选时间段有重叠 -->
+                    (p.service_start_time &lt;= #{serviceEndTime} and p.service_end_time &gt;= #{serviceStartTime})
+                    or
+                    <!-- 全天服务 (08:00-22:00) 包含在所有时间段中 -->
+                    (p.service_start_time = '08:00' and p.service_end_time = '22:00')
+                )
+            </if>
+            <!-- 评分筛选 -->
+            <if test="companyRating != null">
+                and c.avg_rating &gt;= #{companyRating}
+            </if>
+            <!-- 价格区间筛选 -->
+            <if test="minPrice != null">
+                and CAST(p.kedanjia AS DECIMAL(10,2)) &gt;= #{minPrice}
+            </if>
+            <if test="maxPrice != null">
+                and CAST(p.kedanjia AS DECIMAL(10,2)) &lt;= #{maxPrice}
+            </if>
 
         </where>
 order by createtime desc
@@ -111,7 +132,8 @@ order by createtime desc
     <!--统计总行数-->
     <select id="count" resultType="java.lang.Long">
         select count(1)
-        from product
+        from product p
+        left join company c on c.id = p.companyid
         <where>
             <if test="id != null">
                 and id = #{id}
@@ -164,22 +186,34 @@ order by createtime desc
             <if test="spare2 != null and spare2 != ''">
                 and spare2 = #{spare2}
             </if>
-            <if test="serviceStartTime != null and serviceStartTime != ''">
-                and service_start_time &gt;= #{serviceStartTime}
+            <!-- 时间段筛选 - 修改逻辑让全天服务也能在各时间段显示 -->
+            <if test="serviceStartTime != null and serviceStartTime != '' and serviceEndTime != null and serviceEndTime != ''">
+                and (
+                    <!-- 服务时间段与筛选时间段有重叠 -->
+                    (p.service_start_time &lt;= #{serviceEndTime} and p.service_end_time &gt;= #{serviceStartTime})
+                    or
+                    <!-- 全天服务 (08:00-22:00) 包含在所有时间段中 -->
+                    (p.service_start_time = '08:00' and p.service_end_time = '22:00')
+                )
             </if>
-            <if test="serviceEndTime != null and serviceEndTime != ''">
-                and service_end_time &lt;= #{serviceEndTime}
-            </if>
+            <!-- 评分筛选 -->
             <if test="companyRating != null">
                 and c.avg_rating &gt;= #{companyRating}
+            </if>
+            <!-- 价格区间筛选 -->
+            <if test="minPrice != null">
+                and CAST(p.kedanjia AS DECIMAL(10,2)) &gt;= #{minPrice}
+            </if>
+            <if test="maxPrice != null">
+                and CAST(p.kedanjia AS DECIMAL(10,2)) &lt;= #{maxPrice}
             </if>
         </where>
     </select>
 
     <!--新增所有列-->
     <insert id="insert" keyProperty="id" useGeneratedKeys="true">
-        insert into product(productname, productdes, img,detailimg, chengben, kedanjia, kucun, fahuotianshu, chandi, guige, companyid, createtime, status, updatetime, producttype, spare1, spare2)
-        values (#{productname}, #{productdes}, #{img},#{detailimg}, #{chengben}, #{kedanjia}, #{kucun}, #{fahuotianshu}, #{chandi}, #{guige}, #{companyid}, now(), #{status}, now(), #{producttype}, #{spare1}, #{spare2})
+        insert into product(productname, productdes, img,detailimg, chengben, kedanjia, kucun, fahuotianshu, chandi, guige, companyid, createtime, status, updatetime, producttype, spare1, spare2, service_start_time, service_end_time)
+        values (#{productname}, #{productdes}, #{img},#{detailimg}, #{chengben}, #{kedanjia}, #{kucun}, #{fahuotianshu}, #{chandi}, #{guige}, #{companyid}, now(), #{status}, now(), #{producttype}, #{spare1}, #{spare2}, #{serviceStartTime}, #{serviceEndTime})
     </insert>
 
     <insert id="insertBatch" keyProperty="id" useGeneratedKeys="true">
@@ -270,6 +304,12 @@ order by createtime desc
             <if test="spare2 != null and spare2 != ''">
                 spare2 = #{spare2},
             </if>
+            <if test="serviceStartTime != null and serviceStartTime != ''">
+                service_start_time = #{serviceStartTime},
+            </if>
+            <if test="serviceEndTime != null and serviceEndTime != ''">
+                service_end_time = #{serviceEndTime},
+            </if>
         </set>
         where id = #{id}
     </update>
@@ -278,6 +318,44 @@ order by createtime desc
     <delete id="deleteById">
         delete from product where id = #{id}
     </delete>
+
+    <!-- 根据服务商ID统计产品数量 -->
+    <select id="countByCompanyId" resultType="java.lang.Long">
+        select count(1)
+        from product
+        where companyid = #{companyId}
+    </select>
+
+    <!-- 根据服务商ID获取产品类型统计 -->
+    <select id="getProductTypeStatsByCompanyId" resultType="java.util.Map">
+        select
+            pt.type_name,
+            count(p.id) as count
+        from product p
+        left join producttype pt on pt.id = p.producttype
+        where p.companyid = #{companyId}
+        group by p.producttype, pt.type_name
+        order by count desc
+    </select>
+
+    <!-- 更新产品服务时间段数据（用于测试） -->
+    <update id="updateServiceTimeForTesting">
+        UPDATE product
+        SET
+            service_start_time = CASE
+                WHEN MOD(id, 4) = 0 THEN '08:00'
+                WHEN MOD(id, 4) = 1 THEN '12:00'
+                WHEN MOD(id, 4) = 2 THEN '18:00'
+                ELSE '08:00'
+            END,
+            service_end_time = CASE
+                WHEN MOD(id, 4) = 0 THEN '12:00'
+                WHEN MOD(id, 4) = 1 THEN '18:00'
+                WHEN MOD(id, 4) = 2 THEN '22:00'
+                ELSE '22:00'
+            END
+        WHERE service_start_time IS NULL OR service_end_time IS NULL OR service_start_time = '' OR service_end_time = ''
+    </update>
 
 </mapper>
 

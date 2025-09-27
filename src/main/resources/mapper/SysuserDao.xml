@@ -22,6 +22,7 @@
     <select id="queryById" resultMap="SysuserMap">
         select
           id, username, sex, phonenumber, account, password, idcard, address, img, role, createtime, age, remark,money
+        , petname,petage,petdes,pettype
         from sysuser
         where id = #{id}
     </select>

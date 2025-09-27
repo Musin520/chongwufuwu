@@ -65,17 +65,9 @@
 
                             <div class="col-md-11 form-inline">
                                 <el-form :inline="true" :model="queryParams" class="demo-form-inline">
-                                    <el-form-item label="销售商名称">
-                                        <el-input placeholder="销售商名称" v-model="queryParams.companyname"></el-input>
+                                    <el-form-item label="联系方式">
+                                        <el-input placeholder="联系方式" v-model="queryParams.phonenumber"></el-input>
                                     </el-form-item>
-<!--                                    <el-form-item label="类型">-->
-<!--                                        <el-select placeholder="类型" v-model="queryParams.type">-->
-<!--                                            <el-option :label="item.typeName" :value="item.id"-->
-<!--                                                       v-for="item in selectList">-->
-
-<!--                                            </el-option>-->
-<!--                                        </el-select>-->
-<!--                                    </el-form-item>-->
                                     <el-form-item>
                                         <el-button @click="getList" type="primary"><i class="fa fa-search"></i> 查询
                                         </el-button>
@@ -100,24 +92,8 @@
                                     </el-table-column>
                                     <el-table-column
                                             align="center"
-                                            label="图片"
-                                            prop="img"
-                                    >
-                                        <template slot-scope="scope">
-                                            <el-image :src="scope.row.img"
-                                                      style="width: 100px;height: 100px;"></el-image>
-                                        </template>
-                                    </el-table-column>
-                                    <el-table-column
-                                            align="center"
-                                            label="销售商名称"
-                                            prop="companyname"
-                                    >
-                                    </el-table-column>
-                                    <el-table-column
-                                            align="center"
-                                            label="营业执照统一信贷码"
-                                            prop="yingyezhizhaohao">
+                                            label="服务商名称"
+                                            prop="username">
                                     </el-table-column>
                                     <el-table-column
                                             align="center"
@@ -126,13 +102,13 @@
                                     </el-table-column>
                                     <el-table-column
                                             align="center"
-                                            label="注册时间"
-                                            prop="zhuceshijian">
+                                            label="注册地址"
+                                            prop="address">
                                     </el-table-column>
                                     <el-table-column
                                             align="center"
-                                            label="法人"
-                                            prop="faren">
+                                            label="注册时间"
+                                            prop="zhuceshijian">
                                     </el-table-column>
                                     <el-table-column
                                             align="center"
@@ -187,36 +163,8 @@
     </div>
     <el-dialog :title="title" :visible.sync="open" width="50%">
         <el-form :model="form" :rules="rules" label-width="150px" ref="form">
-            <el-form-item label="图片">
-                <el-upload
-                        :action="baseUrl+'/common/upload'"
-                        :before-remove="beforeRemove"
-                        :file-list="fileList"
-                        :limit="3"
-                        :on-exceed="handleExceed"
-                        :on-preview="handlePreview"
-                        :on-remove="handleRemove"
-                        :on-success="handleFileSuccess"
-                        class="upload-demo"
-                        multiple>
-                    <i class="el-icon-upload"></i>
-                    <div class="el-upload__text">将图片拖到此处，或<em>点击上传</em></div>
-
-                    <el-button size="small" type="primary">点击上传</el-button>
-
-                </el-upload>
-            </el-form-item>
-            <el-form-item label="销售商名称" prop="companyname">
-                <el-input v-model="form.companyname"></el-input>
-            </el-form-item>
-            <el-form-item label="营业执照统一信贷码">
-                <el-input type="text" v-model="form.yingyezhizhaohao"></el-input>
-            </el-form-item>
             <el-form-item label="联系方式">
                 <el-input v-model="form.phonenumber"></el-input>
-            </el-form-item>
-            <el-form-item label="法人">
-                <el-input v-model="form.faren"></el-input>
             </el-form-item>
             <el-form-item label="注册地址">
                 <el-input v-model="form.address"></el-input>
@@ -230,10 +178,6 @@
                 </el-date-picker>
             </el-form-item>
 
-            <el-form-item label="经营范围">
-                <el-input type="textarea" v-model="form.jingyingfanwei"></el-input>
-            </el-form-item>
-
             <el-form-item>
                 <el-button @click="submitEdit" type="primary">保存</el-button>
                 <el-button @click="open = false">取消</el-button>
@@ -242,19 +186,10 @@
     </el-dialog>
     <el-dialog :visible.sync="openDetail" width="50%">
         <el-descriptions :column="4" :title="title" border>
-            <el-descriptions-item :span="4" label="图片">
-                <el-image :src="form.img"
-                          style="width: 100px;height: 100px;"></el-image>
-            </el-descriptions-item>
-            <el-descriptions-item :span="2" label="销售商名称">{{form.companyname}}</el-descriptions-item>
-            <el-descriptions-item :span="2" label="营业执照统一信贷码">{{form.yingyezhizhaohao}}</el-descriptions-item>
             <el-descriptions-item :span="2" label="联系方式">{{form.phonenumber}}</el-descriptions-item>
-            <el-descriptions-item :span="2" label="法人">{{form.faren}}</el-descriptions-item>
             <el-descriptions-item :span="2" label="注册地址">{{form.address}}</el-descriptions-item>
             <el-descriptions-item :span="2" label="注册时间">{{form.zhuceshijian}}</el-descriptions-item>
             <el-descriptions-item :span="2" label="创建时间">{{form.createtime}}</el-descriptions-item>
-            <el-descriptions-item :span="2" label="创建时间">{{form.createtime}}</el-descriptions-item>
-            <el-descriptions-item :span="4" label="经营范围">{{form.jingyingfanwei}}</el-descriptions-item>
         </el-descriptions>
     </el-dialog>
 </div>

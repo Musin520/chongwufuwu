@@ -4,6 +4,7 @@ import com.javaPro.myProject.modules.product.entity.Product;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 宠物服务表(Product)表数据库访问层
@@ -78,6 +79,29 @@ public interface ProductDao {
      * @return 影响行数
      */
     int deleteById(Integer id);
+
+    /**
+     * 根据服务商ID统计产品数量
+     *
+     * @param companyId 服务商ID
+     * @return 产品数量
+     */
+    Long countByCompanyId(@Param("companyId") Integer companyId);
+
+    /**
+     * 根据服务商ID获取产品类型统计
+     *
+     * @param companyId 服务商ID
+     * @return 产品类型统计列表
+     */
+    List<Map<String, Object>> getProductTypeStatsByCompanyId(@Param("companyId") Integer companyId);
+
+    /**
+     * 更新产品服务时间段数据（用于测试）
+     *
+     * @return 更新的记录数
+     */
+    int updateServiceTimeForTesting();
 
 }
 

@@ -29,7 +29,7 @@ public class ImageMigrationService {
     
     private static final Logger logger = LoggerFactory.getLogger(ImageMigrationService.class);
     
-    @Autowired
+    @Autowired(required = false)
     private OSS ossClient;
     
     @Value("${oss.bucketName}")
@@ -51,23 +51,28 @@ public class ImageMigrationService {
      * 迁移所有图片到OSS
      */
     public void migrateAllImages() {
+        if (ossClient == null) {
+            logger.warn("OSS客户端未配置，跳过图片迁移");
+            return;
+        }
+
         logger.info("开始迁移图片到OSS...");
-        
+
         try {
             // 迁移产品图片
             migrateProductImages();
-            
+
             // 迁移用户头像
             migrateUserImages();
-            
+
             // 迁移公告图片
             migrateNoticeImages();
-            
+
             // 迁移静态图片文件
             migrateStaticImages();
-            
+
             logger.info("图片迁移完成！");
-            
+
         } catch (Exception e) {
             logger.error("图片迁移失败", e);
             throw new RuntimeException("图片迁移失败", e);
@@ -78,8 +83,13 @@ public class ImageMigrationService {
      * 迁移产品图片
      */
     public void migrateProductImages() {
+        if (ossClient == null) {
+            logger.warn("OSS客户端未配置，跳过产品图片迁移");
+            return;
+        }
+
         logger.info("开始迁移产品图片...");
-        
+
         List<Product> products = productDao.queryAllByLimit(new Product());
         
         for (Product product : products) {
@@ -118,8 +128,13 @@ public class ImageMigrationService {
      * 迁移用户头像
      */
     public void migrateUserImages() {
+        if (ossClient == null) {
+            logger.warn("OSS客户端未配置，跳过用户头像迁移");
+            return;
+        }
+
         logger.info("开始迁移用户头像...");
-        
+
         List<Sysuser> users = sysuserDao.queryAllByLimit(new Sysuser());
         
         for (Sysuser user : users) {
@@ -140,8 +155,13 @@ public class ImageMigrationService {
      * 迁移公告图片
      */
     public void migrateNoticeImages() {
+        if (ossClient == null) {
+            logger.warn("OSS客户端未配置，跳过公告图片迁移");
+            return;
+        }
+
         logger.info("开始迁移公告图片...");
-        
+
         List<Webnotice> notices = webnoticeDao.queryAllByLimit(new Webnotice());
         
         for (Webnotice notice : notices) {
@@ -162,8 +182,13 @@ public class ImageMigrationService {
      * 迁移静态图片文件
      */
     public void migrateStaticImages() {
+        if (ossClient == null) {
+            logger.warn("OSS客户端未配置，跳过静态图片文件迁移");
+            return;
+        }
+
         logger.info("开始迁移静态图片文件...");
-        
+
         String staticImgPath = System.getProperty("user.dir") + "/src/main/resources/static/img/";
         File imgDir = new File(staticImgPath);
         

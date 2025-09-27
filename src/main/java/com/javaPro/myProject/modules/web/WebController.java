@@ -107,4 +107,15 @@ public String usersingle() {
     return "/webSite/single-product";
 }
 
+//----------------------服务商
+@GetMapping({"/companyindex"})
+public String companyindex() {
+    return "/webSite/index";
+}
+
+@GetMapping({"/provider/dashboard"})
+public String providerDashboard() {
+    return "provider-dashboard";
+}
+
 }

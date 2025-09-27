@@ -8,7 +8,9 @@ import com.javaPro.myProject.modules.userlike.dao.UserlikeDao;
 import com.javaPro.myProject.modules.userlike.entity.Userlike;
 import com.javaPro.myProject.modules.company.service.CompanyService;
 import com.javaPro.myProject.modules.company.entity.Company;
-import org.openqa.selenium.json.Json;
+import com.javaPro.myProject.modules.sysuser.service.SysuserService;
+import com.javaPro.myProject.modules.sysuser.entity.Sysuser;
+
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -31,6 +33,8 @@ public class ProductServiceImpl implements ProductService {
     private UserlikeDao userlikeDao;
     @Resource
     private CompanyService companyService;
+    @Resource
+    private SysuserService sysuserService;
     /**
      * 通过ID查询单条数据
      *
@@ -53,8 +57,20 @@ public class ProductServiceImpl implements ProductService {
                 System.out.println("Product companyid: " + product.getCompanyid());
                 Company company = companyService.queryById(product.getCompanyid());
                 if (company != null) {
-                    System.out.println("Found company: " + company.getCompanyname());
-                    product.setCompanyName(company.getCompanyname());
+                    System.out.println("Found company with ID: " + company.getId());
+
+                    // 通过createid获取用户信息，显示用户名作为服务商名称
+                    if (company.getCreateid() != null) {
+                        Sysuser user = sysuserService.queryById(company.getCreateid());
+                        if (user != null && user.getUsername() != null) {
+                            product.setCompanyName(user.getUsername());
+                        } else {
+                            product.setCompanyName("服务商" + company.getId());
+                        }
+                    } else {
+                        product.setCompanyName("服务商" + company.getId());
+                    }
+
                     product.setCompanyRating(company.getAvgRating());
                     product.setCompanyRatingCount(company.getRatingCount());
                     product.setCompanyServiceArea(company.getServiceArea());
@@ -143,5 +159,15 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public boolean deleteById(Integer id) {
         return this.productDao.deleteById(id) > 0;
+    }
+
+    /**
+     * 更新产品服务时间段数据（用于测试）
+     *
+     * @return 更新的记录数
+     */
+    @Override
+    public int updateServiceTimeForTesting() {
+        return this.productDao.updateServiceTimeForTesting();
     }
 }

@@ -1,12 +1,100 @@
 spring:
+  application:
+    name: myProject-test
+
+  # 数据库配置 - 使用H2内存数据库进行测试
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 1
+      connection-timeout: 30000
+
+  # H2数据库控制台（仅测试环境）
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+  # JPA配置
+  jpa:
+    hibernate:
+      ddl-auto: none  # 使用SQL脚本初始化，不使用Hibernate自动建表
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.H2Dialect
+
+  # SQL初始化配置
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:schema.sql
+      data-locations: classpath:data.sql
+      continue-on-error: false
+
+  # Redis配置 - 测试环境可以禁用或使用嵌入式
+  redis:
+    host: localhost
+    port: 6379
+    password:
+    database: 1
+    timeout: 5000ms
+    jedis:
+      pool:
+        max-active: 10
+        max-wait: -1ms
+        max-idle: 5
+        min-idle: 0
+
+  # 文件上传配置
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+  # 允许循环依赖
   main:
     allow-circular-references: true
 
+# 服务器配置
+server:
+  port: 0  # 随机端口，避免测试冲突
+
+# MyBatis配置
+mybatis:
+  mapper-locations: classpath:/mapper/*.xml
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    map-underscore-to-camel-case: true
+
+# OSS配置 - 测试环境（禁用OSS，使用本地存储）
 oss:
+  enabled: false
   endpoint: ${TEST_OSS_ENDPOINT:http://localhost:9000}
-  accessKeyId: ${TEST_ACCESS_KEY:testkey}
-  accessKeySecret: ${TEST_ACCESS_SECRET:testsecret}
-  bucketName: ${TEST_BUCKET:test-bucket}
+  accessKeyId: ${TEST_ACCESS_KEY:your-access-key-id}
+  accessKeySecret: ${TEST_ACCESS_SECRET:your-access-key-secret}
+  bucketName: ${TEST_BUCKET:default-bucket}
   urlPrefix: ${TEST_URL_PREFIX:http://localhost:9000/test-bucket/}
 
-# 移除profiles.active配置，因为这会在profile-specific文件中引起冲突
+# 日志配置
+logging:
+  level:
+    com.javaPro.myProject: DEBUG
+    org.springframework.web: INFO
+    org.springframework.security: INFO
+    org.hibernate: INFO
+    org.springframework.test: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+# 测试专用配置
+test:
+  database:
+    init-mode: always
+  mock:
+    enabled: true

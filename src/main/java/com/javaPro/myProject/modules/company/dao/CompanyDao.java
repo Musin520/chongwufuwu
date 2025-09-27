@@ -86,5 +86,13 @@ public interface CompanyDao {
      */
     int deleteById(Integer id);
 
+    /**
+     * 根据创建者ID查询服务商信息
+     *
+     * @param createid 创建者ID（用户ID）
+     * @return 服务商信息
+     */
+    Company queryByCreateId(Integer createid);
+
 }
 

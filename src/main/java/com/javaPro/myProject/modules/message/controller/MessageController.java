@@ -48,13 +48,35 @@ public class MessageController extends BaseController {
     }
 
     /**
-     * 新增数据
+     * 新增数据 (JSON格式)
      *
      * @param message 实体
      * @return 新增结果
      */
     @PostMapping
     public AjaxResult add(@RequestBody Message message) {
+        return AjaxResult.ok(this.messageService.insert(message));
+    }
+
+    /**
+     * 新增数据 (表单格式)
+     *
+     * @param content 消息内容
+     * @param senderid 发送者ID
+     * @param receiveid 接收者ID
+     * @param status 状态
+     * @return 新增结果
+     */
+    @PostMapping("/form")
+    public AjaxResult addByForm(@RequestParam String content,
+                               @RequestParam Integer senderid,
+                               @RequestParam Integer receiveid,
+                               @RequestParam(defaultValue = "0") String status) {
+        Message message = new Message();
+        message.setContent(content);
+        message.setSenderid(senderid);
+        message.setReceiveid(receiveid);
+        message.setStatus(status);
         return AjaxResult.ok(this.messageService.insert(message));
     }
 
@@ -78,6 +100,23 @@ public class MessageController extends BaseController {
     @DeleteMapping
     public AjaxResult deleteById(Integer id) {
         return AjaxResult.ok(this.messageService.deleteById(id));
+    }
+
+    /**
+     * 获取聊天记录
+     *
+     * @param userId 当前用户ID
+     * @param partnerId 聊天对象ID
+     * @return 聊天记录
+     */
+    @GetMapping("/chat")
+    public ListByPage getChatMessages(@RequestParam Integer userId, @RequestParam Integer partnerId) {
+        try {
+            return getList(this.messageService.getChatMessages(userId, partnerId));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return getList(500, "获取聊天记录失败: " + e.getMessage());
+        }
     }
 
 }

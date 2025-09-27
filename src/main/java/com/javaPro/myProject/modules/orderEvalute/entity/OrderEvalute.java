@@ -34,9 +34,9 @@ public class OrderEvalute implements Serializable {
     private Integer companyid;
 
     /**
-     * 评分（1-5分）
+     * 评分（1-5分，支持0.5倍数）
      */
-    private Integer rating;
+    private Double rating;
 
     private Sysuser sysuser;
 

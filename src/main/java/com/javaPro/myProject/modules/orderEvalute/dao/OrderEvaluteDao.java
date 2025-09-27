@@ -5,6 +5,7 @@ import org.apache.ibatis.annotations.Param;
 
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 评价表(OrderEvalute)表数据库访问层
@@ -75,6 +76,38 @@ public interface OrderEvaluteDao {
      * @return 影响行数
      */
     int deleteById(Integer id);
+
+    /**
+     * 计算服务商的平均评分
+     *
+     * @param companyid 服务商ID
+     * @return 平均评分
+     */
+    Double getAvgRatingByCompanyId(Integer companyid);
+
+    /**
+     * 获取服务商的评价总数
+     *
+     * @param companyid 服务商ID
+     * @return 评价总数
+     */
+    Integer getRatingCountByCompanyId(Integer companyid);
+
+    /**
+     * 根据服务商ID查询评价列表
+     *
+     * @param companyid 服务商ID
+     * @return 评价列表
+     */
+    List<OrderEvalute> queryByCompanyId(Integer companyid);
+
+    /**
+     * 根据服务商ID获取评分分布统计
+     *
+     * @param companyId 服务商ID
+     * @return 评分分布统计列表
+     */
+    List<Map<String, Object>> getRatingDistributionByCompanyId(@Param("companyId") Integer companyId);
 
 }
 

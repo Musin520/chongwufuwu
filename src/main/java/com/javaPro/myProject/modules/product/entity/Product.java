@@ -106,6 +106,12 @@ public class Product implements Serializable {
     private Integer companyRatingCount;
     private String companyServiceArea;
 
+    /**
+     * 价格区间筛选字段（查询时使用，不存储到数据库）
+     */
+    private Double minPrice;
+    private Double maxPrice;
+
     public String getServiceStartTime() {
         return serviceStartTime;
     }
@@ -154,5 +160,20 @@ public class Product implements Serializable {
         this.companyServiceArea = companyServiceArea;
     }
 
+    public Double getMinPrice() {
+        return minPrice;
+    }
+
+    public void setMinPrice(Double minPrice) {
+        this.minPrice = minPrice;
+    }
+
+    public Double getMaxPrice() {
+        return maxPrice;
+    }
+
+    public void setMaxPrice(Double maxPrice) {
+        this.maxPrice = maxPrice;
+    }
 }
 

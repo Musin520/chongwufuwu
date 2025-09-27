@@ -90,7 +90,7 @@
       <div class="hero-content py-0 py-md-5">
         <div class="container-lg d-flex flex-column d-md-block align-items-center">
           <nav class="breadcrumb">
-            <a class="breadcrumb-item nav-link" href="/static/webindex">主页</a>
+            <a class="breadcrumb-item nav-link" href="/web/userindex">主页</a>
             <span  class="breadcrumb-item active" aria-current="page">宠物服务详情</span>
           </nav>
           <h1 style="color: whitesmoke">宠物服务详情</h1>
@@ -100,7 +100,7 @@
     <section id="selling-product" class="single-product mt-0 mt-md-5">
       <div class="container-lg">
         <nav class="breadcrumb">
-          <a class="breadcrumb-item" href="/web/userindex">主页</a>
+          <a class="breadcrumb-item" href="/web/userproductlist">上一页</a>
           <span class="breadcrumb-item active" aria-current="page">宠物服务详情</span>
         </nav>
         <div class="row g-5">
@@ -194,6 +194,15 @@
                 <div class="meta-item d-flex align-items-baseline">
                   <h6 class="item-title no-margin pe-2">服务天数:</h6>
                   <span>{{productInfo.fahuotianshu}}</span>
+                </div>
+                <div class="meta-item d-flex align-items-baseline">
+                  <h6 class="item-title no-margin pe-2">服务时间:</h6>
+                  <span class="text-success">
+                    <i class="fa fa-clock-o me-1"></i>
+                    {{productInfo.serviceStartTime && productInfo.serviceEndTime ?
+                      productInfo.serviceStartTime + ' - ' + productInfo.serviceEndTime :
+                      '时间待定'}}
+                  </span>
                 </div>
                 <div class="meta-item d-flex align-items-baseline">
                   <h6 class="item-title no-margin pe-2">商品分类:</h6>
@@ -420,11 +429,8 @@
     <el-dialog title="服务商详情" :visible.sync="providerDialogVisible" width="60%">
       <div v-if="providerInfo">
         <el-descriptions :column="2" title="基本信息" border>
-          <el-descriptions-item label="服务商名称">{{providerInfo.companyname}}</el-descriptions-item>
-          <el-descriptions-item label="法人代表">{{providerInfo.faren}}</el-descriptions-item>
+          <el-descriptions-item label="服务商名称">{{providerInfo.username || '服务商' + providerInfo.id}}</el-descriptions-item>
           <el-descriptions-item label="联系电话">{{providerInfo.phonenumber}}</el-descriptions-item>
-          <el-descriptions-item label="营业执照号">{{providerInfo.yingyezhizhaohao}}</el-descriptions-item>
-          <el-descriptions-item label="经营范围" :span="2">{{providerInfo.jingyingfanwei}}</el-descriptions-item>
           <el-descriptions-item label="服务地址" :span="2">{{providerInfo.address}}</el-descriptions-item>
           <el-descriptions-item label="服务区域">{{providerInfo.serviceArea || '暂无信息'}}</el-descriptions-item>
           <el-descriptions-item label="服务时间">{{providerInfo.serviceTime || '暂无信息'}}</el-descriptions-item>
@@ -467,6 +473,52 @@
           </div>
         </div>
       </div>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="providerDialogVisible = false">关闭</el-button>
+        <el-button v-if="userId && role === '2'" type="primary" @click="contactProvider">联系服务商</el-button>
+      </div>
+    </el-dialog>
+
+    <!-- 联系服务商对话框 -->
+    <el-dialog title="联系服务商" :visible.sync="contactDialogVisible" width="50%">
+      <div v-if="providerInfo">
+        <div class="mb-3">
+          <strong>服务商：</strong>{{providerInfo.username || '服务商' + providerInfo.id}}
+        </div>
+
+        <!-- 聊天消息区域 -->
+        <div class="chat-messages" ref="chatMessages" style="height: 300px; overflow-y: auto; border: 1px solid #ddd; padding: 10px; margin-bottom: 15px; background-color: #f9f9f9;">
+          <div v-for="msg in chatMessages" :key="msg.id" class="message-item" :class="msg.senderid == userId ? 'sent' : 'received'" style="margin-bottom: 10px;">
+            <div class="message-header" style="font-size: 12px; color: #666; margin-bottom: 5px;">
+              <span>{{msg.senderid == userId ? '我' : (providerInfo.username || '服务商' + providerInfo.id)}}</span>
+              <span style="float: right;">{{new Date(msg.createtime).toLocaleString()}}</span>
+            </div>
+            <div class="message-content" :style="msg.senderid == userId ? 'background-color: #007bff; color: white; padding: 8px 12px; border-radius: 10px; display: inline-block; max-width: 70%; float: right; clear: both;' : 'background-color: white; color: #333; padding: 8px 12px; border-radius: 10px; display: inline-block; max-width: 70%; float: left; clear: both;'">
+              {{msg.content}}
+            </div>
+            <div style="clear: both;"></div>
+          </div>
+          <div v-if="!chatMessages || chatMessages.length === 0" class="text-center text-muted py-4">
+            暂无聊天记录，开始对话吧！
+          </div>
+        </div>
+
+        <!-- 消息输入区域 -->
+        <div class="message-input">
+          <el-input
+            type="textarea"
+            :rows="3"
+            placeholder="请输入您要发送的消息..."
+            v-model="newMessage"
+            maxlength="500"
+            show-word-limit>
+          </el-input>
+        </div>
+      </div>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="contactDialogVisible = false">关闭</el-button>
+        <el-button type="primary" @click="sendMessageToProvider" :disabled="!newMessage.trim()">发送消息</el-button>
+      </div>
     </el-dialog>
 
   </div>
@@ -508,6 +560,9 @@
           providerInfo: null,
           providerEvaluations: [],
           evaluationLoading: false,
+          contactDialogVisible: false,
+          chatMessages: [],
+          newMessage: '',
 
           queryParams: {
             pageSize: 10,
@@ -582,12 +637,39 @@
                   that.currentImgInfo = data.Data.img
                 }
                 that.getList()
+
+                // 获取最新的服务商评分统计
+                that.updateCompanyRating();
               }
             },
             error: function () {
               windowsAuto(500, "服务器异常！network error！")
             }
           });
+        },
+
+        // 更新服务商评分统计
+        updateCompanyRating() {
+          let that = this;
+          if (that.productInfo && that.productInfo.companyid) {
+            $.ajax({
+              url: that.baseUrl + "/orderEvalute/ratingStats",
+              type: "GET",
+              data: {
+                companyid: that.productInfo.companyid
+              },
+              success: function (data) {
+                if (data.code === 200) {
+                  // 更新产品信息中的评分数据
+                  that.productInfo.companyRating = data.avgRating;
+                  that.productInfo.companyRatingCount = data.ratingCount;
+                }
+              },
+              error: function () {
+                console.error("获取评分统计失败");
+              }
+            });
+          }
         },
         // 获取列表
         getList() {
@@ -668,6 +750,109 @@
           });
         },
 
+        // 联系服务商
+        contactProvider() {
+          let that = this;
+          if (!that.userId) {
+            toastr.error("请先登录", '提示');
+            return;
+          }
+
+          if (that.role !== '2') {
+            toastr.error("只有用户可以联系服务商", '提示');
+            return;
+          }
+
+          that.contactDialogVisible = true;
+          that.loadChatWithProvider();
+        },
+
+        // 加载与服务商的聊天记录
+        loadChatWithProvider() {
+          let that = this;
+          if (!that.providerInfo || !that.providerInfo.createid) {
+            toastr.error("服务商信息不完整", '提示');
+            return;
+          }
+
+          console.log("加载聊天记录 - 用户ID:", that.userId, "服务商用户ID:", that.providerInfo.createid);
+
+          $.ajax({
+            url: that.baseUrl + "/message/chat",
+            type: "GET",
+            data: {
+              userId: parseInt(that.userId),
+              partnerId: parseInt(that.providerInfo.createid)
+            },
+            success: function (data) {
+              console.log("聊天记录响应:", data);
+              if (data.code === 200) {
+                that.chatMessages = data.list || [];
+                that.$nextTick(() => {
+                  that.scrollChatToBottom();
+                });
+              } else {
+                console.error("获取聊天记录失败:", data.msg);
+                that.chatMessages = [];
+              }
+            },
+            error: function (xhr, status, error) {
+              console.error("加载聊天记录失败:", error);
+              toastr.error("加载聊天记录失败", '提示');
+              that.chatMessages = [];
+            }
+          });
+        },
+
+        // 发送消息给服务商
+        sendMessageToProvider() {
+          let that = this;
+          if (!that.newMessage.trim()) {
+            toastr.warning("请输入消息内容", '提示');
+            return;
+          }
+
+          if (!that.providerInfo || !that.providerInfo.createid) {
+            toastr.error("服务商信息不完整", '提示');
+            return;
+          }
+
+          console.log("发送消息 - 发送者ID:", that.userId, "接收者ID:", that.providerInfo.createid, "内容:", that.newMessage);
+
+          $.ajax({
+            url: that.baseUrl + "/message/form",
+            type: "POST",
+            data: {
+              content: that.newMessage,
+              senderid: parseInt(that.userId),
+              receiveid: parseInt(that.providerInfo.createid),
+              status: "0"
+            },
+            success: function (data) {
+              console.log("发送消息响应:", data);
+              if (data.code === 200) {
+                that.newMessage = '';
+                that.loadChatWithProvider(); // 重新加载消息
+                toastr.success("消息发送成功", '提示');
+              } else {
+                console.error("发送消息失败:", data.msg);
+                toastr.error(data.msg || "发送失败", '提示');
+              }
+            },
+            error: function (xhr, status, error) {
+              console.error("发送消息网络错误:", error);
+              toastr.error("发送消息失败", '提示');
+            }
+          });
+        },
+
+        // 滚动聊天区域到底部
+        scrollChatToBottom() {
+          if (this.$refs.chatMessages) {
+            this.$refs.chatMessages.scrollTop = this.$refs.chatMessages.scrollHeight;
+          }
+        },
+
       },
       watch: {},
       mounted() {
@@ -677,8 +862,44 @@
         if (id){
           that.id = id
           that.getDetail()
-
         }
+
+        // 监听评分更新事件
+        window.addEventListener('storage', function(e) {
+          if (e.key === 'ratingUpdate' && e.newValue) {
+            try {
+              const ratingData = JSON.parse(e.newValue);
+              // 如果更新的是当前产品的服务商，则更新评分显示
+              if (that.productInfo && that.productInfo.companyid === ratingData.companyid) {
+                that.productInfo.companyRating = ratingData.avgRating;
+                that.productInfo.companyRatingCount = ratingData.ratingCount;
+
+                // 如果服务商详情对话框是打开的，也更新对话框中的评分
+                if (that.providerDialogVisible && that.providerInfo) {
+                  that.providerInfo.avgRating = ratingData.avgRating;
+                  that.providerInfo.ratingCount = ratingData.ratingCount;
+                }
+
+                console.log('评分已实时更新:', ratingData);
+              }
+            } catch (error) {
+              console.error('解析评分更新数据失败:', error);
+            }
+          }
+        });
+
+        // 监听同页面内的评分更新（用于处理同一页面内的评分更新）
+        window.addEventListener('ratingUpdated', function(e) {
+          if (that.productInfo && that.productInfo.companyid === e.detail.companyid) {
+            that.productInfo.companyRating = e.detail.avgRating;
+            that.productInfo.companyRatingCount = e.detail.ratingCount;
+
+            if (that.providerDialogVisible && that.providerInfo) {
+              that.providerInfo.avgRating = e.detail.avgRating;
+              that.providerInfo.ratingCount = e.detail.ratingCount;
+            }
+          }
+        });
 
       }
     })

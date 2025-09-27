@@ -96,7 +96,6 @@ public class LoginController {
         if ("3".equals(param.getRole())) {
             Company company = new Company();
             company.setId(insert.getId()); // 使用用户ID作为Company的ID
-            company.setCompanyname(param.getUsername() + "的服务商店"); // 默认公司名称
             company.setPhonenumber(param.getPhonenumber());
             company.setCreateid(insert.getId());
             company.setStatus("1"); // 默认状态为启用

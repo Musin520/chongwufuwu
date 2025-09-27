@@ -3,7 +3,9 @@ package com.javaPro.myProject.modules.order.dao;
 import com.javaPro.myProject.modules.order.entity.Order;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 订单表(Order)表数据库访问层
@@ -77,6 +79,40 @@ public interface OrderDao {
      * @return 影响行数
      */
     int deleteById(Integer id);
+
+    /**
+     * 根据服务商ID统计订单数量
+     *
+     * @param companyId 服务商ID
+     * @return 订单数量
+     */
+    Long countByCompanyId(@Param("companyId") Integer companyId);
+
+    /**
+     * 根据服务商ID获取总收入
+     *
+     * @param companyId 服务商ID
+     * @return 总收入
+     */
+    Double getTotalRevenueByCompanyId(@Param("companyId") Integer companyId);
+
+    /**
+     * 根据日期和服务商ID获取订单数量
+     *
+     * @param date 日期
+     * @param companyId 服务商ID
+     * @return 订单数量
+     */
+    Long getOrderCountByDateAndCompanyId(@Param("date") Date date, @Param("companyId") Integer companyId);
+
+    /**
+     * 获取服务商最近订单
+     *
+     * @param companyId 服务商ID
+     * @param limit 限制数量
+     * @return 最近订单列表
+     */
+    List<Map<String, Object>> getRecentOrdersByCompanyId(@Param("companyId") Integer companyId, @Param("limit") Integer limit);
 
 }
 

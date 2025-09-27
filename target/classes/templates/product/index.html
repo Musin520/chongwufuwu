@@ -233,6 +233,29 @@
                 </el-select>
             </el-form-item>
 
+            <!-- 服务时间区间 -->
+            <el-form-item label="服务时间区间">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <el-time-picker
+                        v-model="form.serviceStartTime"
+                        placeholder="开始时间"
+                        format="HH:mm"
+                        value-format="HH:mm"
+                        style="width: 120px;">
+                    </el-time-picker>
+                    <span>至</span>
+                    <el-time-picker
+                        v-model="form.serviceEndTime"
+                        placeholder="结束时间"
+                        format="HH:mm"
+                        value-format="HH:mm"
+                        style="width: 120px;">
+                    </el-time-picker>
+                </div>
+                <div style="font-size: 12px; color: #909399; margin-top: 5px;">
+                    请设置您提供此服务的时间段，例如：09:00 至 18:00
+                </div>
+            </el-form-item>
 
             <el-form-item label="宠物服务描述">
                 <el-input type="textarea" v-model="form.productdes"></el-input>
@@ -262,6 +285,9 @@
                 <el-select v-model="form.producttype">
                     <el-option v-for="item in selectList" :label="item.typeName" :value="item.id+''"></el-option>
                 </el-select>
+            </el-descriptions-item>
+            <el-descriptions-item :span="2" label="服务时间">
+                {{form.serviceStartTime && form.serviceEndTime ? form.serviceStartTime + ' - ' + form.serviceEndTime : '未设置'}}
             </el-descriptions-item>
             <el-descriptions-item :span="2" label="服务天数">{{form.fahuotianshu}}</el-descriptions-item>
             <el-descriptions-item :span="2" label="创建时间">{{form.createtime}}</el-descriptions-item>

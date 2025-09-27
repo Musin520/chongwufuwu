@@ -4,12 +4,7 @@
 
     <resultMap type="com.javaPro.myProject.modules.company.entity.Company" id="CompanyMap">
         <result property="id" column="id" jdbcType="INTEGER"/>
-        <result property="companyname" column="companyname" jdbcType="VARCHAR"/>
-        <result property="img" column="img" jdbcType="VARCHAR"/>
-        <result property="yingyezhizhaohao" column="yingyezhizhaohao" jdbcType="VARCHAR"/>
-        <result property="faren" column="faren" jdbcType="VARCHAR"/>
         <result property="phonenumber" column="phonenumber" jdbcType="VARCHAR"/>
-        <result property="jingyingfanwei" column="jingyingfanwei" jdbcType="VARCHAR"/>
         <result property="address" column="address" jdbcType="VARCHAR"/>
         <result property="zhuceshijian" column="zhuceshijian" jdbcType="VARCHAR"/>
         <result property="createtime" column="createtime" jdbcType="TIMESTAMP"/>
@@ -26,7 +21,7 @@
     <!--查询单个-->
     <select id="queryById" resultMap="CompanyMap">
         select
-          id, companyname, img, yingyezhizhaohao, faren, phonenumber, jingyingfanwei, address, zhuceshijian, createtime, updatetime, status, createid,
+          id, phonenumber, address, zhuceshijian, createtime, updatetime, status, createid,
           service_time, avg_rating, rating_count, service_area
         from company
         where id = #{id}
@@ -35,30 +30,15 @@
     <!--查询指定行数据-->
     <select id="queryAllByLimit" resultMap="CompanyMap">
         select
-          id, companyname, img, yingyezhizhaohao, faren, phonenumber, jingyingfanwei, address, zhuceshijian, createtime, updatetime, status, createid,
+          id, phonenumber, address, zhuceshijian, createtime, updatetime, status, createid,
           service_time, avg_rating, rating_count, service_area
         from company
         <where>
             <if test="id != null">
                 and id = #{id}
             </if>
-            <if test="companyname != null and companyname != ''">
-                and companyname like concat('%',#{companyname},'%')
-            </if>
-            <if test="img != null and img != ''">
-                and img = #{img}
-            </if>
-            <if test="yingyezhizhaohao != null and yingyezhizhaohao != ''">
-                and yingyezhizhaohao = #{yingyezhizhaohao}
-            </if>
-            <if test="faren != null and faren != ''">
-                and faren = #{faren}
-            </if>
             <if test="phonenumber != null and phonenumber != ''">
                 and phonenumber = #{phonenumber}
-            </if>
-            <if test="jingyingfanwei != null and jingyingfanwei != ''">
-                and jingyingfanwei = #{jingyingfanwei}
             </if>
             <if test="address != null and address != ''">
                 and address = #{address}
@@ -90,23 +70,8 @@ order by createtime desc
             <if test="id != null">
                 and id = #{id}
             </if>
-            <if test="companyname != null and companyname != ''">
-                and companyname = #{companyname}
-            </if>
-            <if test="img != null and img != ''">
-                and img = #{img}
-            </if>
-            <if test="yingyezhizhaohao != null and yingyezhizhaohao != ''">
-                and yingyezhizhaohao = #{yingyezhizhaohao}
-            </if>
-            <if test="faren != null and faren != ''">
-                and faren = #{faren}
-            </if>
             <if test="phonenumber != null and phonenumber != ''">
                 and phonenumber = #{phonenumber}
-            </if>
-            <if test="jingyingfanwei != null and jingyingfanwei != ''">
-                and jingyingfanwei = #{jingyingfanwei}
             </if>
             <if test="address != null and address != ''">
                 and address = #{address}
@@ -131,37 +96,32 @@ order by createtime desc
 
     <!--新增所有列-->
     <insert id="insert" keyProperty="id" useGeneratedKeys="true">
-        insert into company(companyname, img, yingyezhizhaohao, faren, phonenumber, jingyingfanwei, address, zhuceshijian, createtime, updatetime, status, createid)
-        values (#{companyname}, #{img}, #{yingyezhizhaohao}, #{faren}, #{phonenumber}, #{jingyingfanwei}, #{address}, #{zhuceshijian}, now(), now(), #{status}, #{createid})
+        insert into company(phonenumber, address, zhuceshijian, createtime, updatetime, status, createid)
+        values (#{phonenumber}, #{address}, #{zhuceshijian}, now(), now(), #{status}, #{createid})
     </insert>
 
     <!--新增指定ID的记录-->
     <insert id="insertWithId">
-        insert into company(id, companyname, img, yingyezhizhaohao, faren, phonenumber, jingyingfanwei, address, zhuceshijian, createtime, updatetime, status, createid)
-        values (#{id}, #{companyname}, #{img}, #{yingyezhizhaohao}, #{faren}, #{phonenumber}, #{jingyingfanwei}, #{address}, #{zhuceshijian}, now(), now(), #{status}, #{createid})
+        insert into company(id, phonenumber, address, zhuceshijian, createtime, updatetime, status, createid)
+        values (#{id}, #{phonenumber}, #{address}, #{zhuceshijian}, now(), now(), #{status}, #{createid})
     </insert>
 
     <insert id="insertBatch" keyProperty="id" useGeneratedKeys="true">
-        insert into company(companyname, img, yingyezhizhaohao, faren, phonenumber, jingyingfanwei, address, zhuceshijian, createtime, updatetime, status, createid)
+        insert into company(phonenumber, address, zhuceshijian, createtime, updatetime, status, createid)
         values
         <foreach collection="entities" item="entity" separator=",">
-        (#{entity.companyname}, #{entity.img}, #{entity.yingyezhizhaohao}, #{entity.faren}, #{entity.phonenumber}, #{entity.jingyingfanwei}, #{entity.address}, #{entity.zhuceshijian}, #{entity.createtime}, #{entity.updatetime}, #{entity.status}, #{entity.createid})
+        (#{entity.phonenumber}, #{entity.address}, #{entity.zhuceshijian}, #{entity.createtime}, #{entity.updatetime}, #{entity.status}, #{entity.createid})
         </foreach>
     </insert>
 
     <insert id="insertOrUpdateBatch" keyProperty="id" useGeneratedKeys="true">
-        insert into company(companyname, img, yingyezhizhaohao, faren, phonenumber, jingyingfanwei, address, zhuceshijian, createtime, updatetime, status, createid)
+        insert into company(phonenumber, address, zhuceshijian, createtime, updatetime, status, createid)
         values
         <foreach collection="entities" item="entity" separator=",">
-            (#{entity.companyname}, #{entity.img}, #{entity.yingyezhizhaohao}, #{entity.faren}, #{entity.phonenumber}, #{entity.jingyingfanwei}, #{entity.address}, #{entity.zhuceshijian}, #{entity.createtime}, #{entity.updatetime}, #{entity.status}, #{entity.createid})
+            (#{entity.phonenumber}, #{entity.address}, #{entity.zhuceshijian}, #{entity.createtime}, #{entity.updatetime}, #{entity.status}, #{entity.createid})
         </foreach>
         on duplicate key update
-        companyname = values(companyname),
-        img = values(img),
-        yingyezhizhaohao = values(yingyezhizhaohao),
-        faren = values(faren),
         phonenumber = values(phonenumber),
-        jingyingfanwei = values(jingyingfanwei),
         address = values(address),
         zhuceshijian = values(zhuceshijian),
         createtime = values(createtime),
@@ -174,23 +134,8 @@ order by createtime desc
     <update id="update">
         update company
         <set>
-            <if test="companyname != null and companyname != ''">
-                companyname = #{companyname},
-            </if>
-            <if test="img != null and img != ''">
-                img = #{img},
-            </if>
-            <if test="yingyezhizhaohao != null and yingyezhizhaohao != ''">
-                yingyezhizhaohao = #{yingyezhizhaohao},
-            </if>
-            <if test="faren != null and faren != ''">
-                faren = #{faren},
-            </if>
             <if test="phonenumber != null and phonenumber != ''">
                 phonenumber = #{phonenumber},
-            </if>
-            <if test="jingyingfanwei != null and jingyingfanwei != ''">
-                jingyingfanwei = #{jingyingfanwei},
             </if>
             <if test="address != null and address != ''">
                 address = #{address},
@@ -210,6 +155,18 @@ order by createtime desc
             <if test="createid != null">
                 createid = #{createid},
             </if>
+            <if test="serviceTime != null">
+                service_time = #{serviceTime},
+            </if>
+            <if test="avgRating != null">
+                avg_rating = #{avgRating},
+            </if>
+            <if test="ratingCount != null">
+                rating_count = #{ratingCount},
+            </if>
+            <if test="serviceArea != null">
+                service_area = #{serviceArea},
+            </if>
         </set>
         where id = #{id}
     </update>
@@ -218,6 +175,16 @@ order by createtime desc
     <delete id="deleteById">
         delete from company where id = #{id}
     </delete>
+
+    <!--根据创建者ID查询服务商信息-->
+    <select id="queryByCreateId" resultMap="CompanyMap">
+        select
+          id, phonenumber, address, zhuceshijian, createtime, updatetime, status, createid,
+          service_time, avg_rating, rating_count, service_area
+        from company
+        where createid = #{createid}
+        limit 1
+    </select>
 
 </mapper>
 

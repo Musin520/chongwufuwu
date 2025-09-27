@@ -9,7 +9,7 @@
         <result property="userid" column="userid" jdbcType="INTEGER"/>
         <result property="orderid" column="orderid" jdbcType="INTEGER"/>
         <result property="companyid" column="companyid" jdbcType="INTEGER"/>
-        <result property="rating" column="rating" jdbcType="INTEGER"/>
+        <result property="rating" column="rating" jdbcType="DOUBLE"/>
         <association property="sysuser" javaType="com.javaPro.myProject.modules.sysuser.entity.Sysuser">
             <result property="id" column="id" jdbcType="INTEGER"/>
             <result property="username" column="username" jdbcType="VARCHAR"/>
@@ -58,6 +58,9 @@
             <if test="orderid != null">
                 and orderid = #{orderid}
             </if>
+            <if test="companyid != null">
+                and oe.companyid = #{companyid}
+            </if>
         </where>
 order by oe.createtime desc
     </select>
@@ -82,13 +85,16 @@ order by oe.createtime desc
             <if test="orderid != null">
                 and orderid = #{orderid}
             </if>
+            <if test="companyid != null">
+                and companyid = #{companyid}
+            </if>
         </where>
     </select>
 
     <!--新增所有列-->
     <insert id="insert" keyProperty="id" useGeneratedKeys="true">
-        insert into order_evalute(content, createtime, userid, orderid,companyid)
-        values (#{content}, now(), #{userid}, #{orderid},#{companyid})
+        insert into order_evalute(content, createtime, userid, orderid, companyid, rating)
+        values (#{content}, now(), #{userid}, #{orderid}, #{companyid}, #{rating})
     </insert>
 
     <insert id="insertBatch" keyProperty="id" useGeneratedKeys="true">
@@ -136,6 +142,37 @@ order by oe.createtime desc
     <delete id="deleteById">
         delete from order_evalute where id = #{id}
     </delete>
+
+    <!--计算服务商的平均评分-->
+    <select id="getAvgRatingByCompanyId" resultType="java.lang.Double">
+        select AVG(rating) from order_evalute where companyid = #{companyid} and rating is not null
+    </select>
+
+    <!--获取服务商的评价总数-->
+    <select id="getRatingCountByCompanyId" resultType="java.lang.Integer">
+        select COUNT(*) from order_evalute where companyid = #{companyid} and rating is not null
+    </select>
+
+    <!--根据服务商ID查询评价列表-->
+    <select id="queryByCompanyId" resultMap="OrderEvaluteMap">
+        select
+          oe.id, content, oe.createtime, oe.userid, orderid, oe.companyid, oe.rating, s.*
+        from order_evalute oe
+        left join sysuser s on s.id = oe.userid
+        where oe.companyid = #{companyid}
+        order by oe.createtime desc
+    </select>
+
+    <!-- 根据服务商ID获取评分分布统计 -->
+    <select id="getRatingDistributionByCompanyId" resultType="java.util.Map">
+        select
+            rating,
+            count(1) as count
+        from order_evalute
+        where companyid = #{companyId} and rating is not null
+        group by rating
+        order by rating
+    </select>
 
 </mapper>
 

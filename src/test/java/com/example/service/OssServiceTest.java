@@ -35,6 +35,8 @@ class OssServiceTest {
     void setUp() {
         ReflectionTestUtils.setField(fileUploadService, "bucketName", "test-bucket");
         ReflectionTestUtils.setField(fileUploadService, "urlPrefix", "https://test-bucket.oss.com/");
+        ReflectionTestUtils.setField(fileUploadService, "accessKeyId", "test-access-key");
+        ReflectionTestUtils.setField(fileUploadService, "ossClient", ossClient);
     }
 
     @Test
@@ -73,6 +75,6 @@ class OssServiceTest {
         when(file.getOriginalFilename()).thenReturn(null);
 
         // When & Then
-        assertThrows(NullPointerException.class, () -> fileUploadService.uploadFile(file));
+        assertThrows(IOException.class, () -> fileUploadService.uploadFile(file));
     }
 }

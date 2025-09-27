@@ -60,4 +60,19 @@ public interface CompanyService {
      */
     boolean deleteById(Integer id);
 
+    /**
+     * 根据创建者ID查询服务商信息
+     *
+     * @param createid 创建者ID（用户ID）
+     * @return 服务商信息
+     */
+    Company queryByCreateId(Integer createid);
+
+    /**
+     * 更新服务商评分统计
+     *
+     * @param companyid 服务商ID
+     */
+    void updateRatingStats(Integer companyid);
+
 }

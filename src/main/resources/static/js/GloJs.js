@@ -60,10 +60,12 @@ function getRoleSetMenu(){
     $(".adminFun ").css({display:"none"})
     $(".workerFun ").css({display:"none"})
     $(".userUnDo").css({display:"none"})
-  }else if (role === "3"){//3
+  }else if (role === "3"){//服务商
     $(".adminFun ").css({display:"none"})
     $(".workUnDo ").css({display:"none"})
     $(".userFun").css({display:"none"})
+    // 服务商显示数据统计菜单
+    $(".userUnDo").css({display:"block"})
   }
   return role
 }

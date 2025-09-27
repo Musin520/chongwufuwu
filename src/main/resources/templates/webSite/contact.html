@@ -32,7 +32,9 @@
         <div class="col-sm-4 col-lg-2 text-center text-sm-start d-flex gap-3 justify-content-center justify-content-md-start">
           <div class="d-flex align-items-center my-3 my-sm-0">
             <a href="/web/userindex">
-              <img src="/static/webSite/images/logo.png" style="width: 50px;height: 50px;" alt="logo" class="img-fluid">
+              <img v-if="userInfo && userInfo.img" :src="userInfo.img" alt="用户头像" class="img-fluid"
+                   style="width: 50px;height: 50px; border-radius: 50%; border: 2px solid #007bff;">
+              <img v-else src="/static/webSite/images/logo.png" style="width: 50px;height: 50px;" alt="logo" class="img-fluid">
             </a>
           </div>
           <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar"
@@ -70,7 +72,12 @@
               <a href="/web/userblog"  class="nav-link ">网站资讯/公告</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link " href="/web/personal" title="个人中心"><i class="fa fa-user"></i></a>
+              <a class="nav-link d-flex align-items-center" href="/web/personal" title="个人中心">
+                <img v-if="userInfo && userInfo.img" :src="userInfo.img" alt="用户头像"
+                     style="width: 30px; height: 30px; border-radius: 50%; margin-right: 5px; border: 2px solid #007bff;">
+                <i v-else class="fa fa-user"></i>
+                <span v-if="userInfo && userInfo.username" style="margin-left: 5px;">{{userInfo.username}}</span>
+              </a>
             </li>
           </ul>
         </div>
@@ -157,6 +164,7 @@
           baseUrl: gloRequestUrl,
           dataList: [],
           producttypeList: [],
+          userInfo: {},
           fileList: [],
           fileStr: [],
           total: 0,
@@ -225,13 +233,30 @@ that.form.content = ""
             }
           })
         },
-
-
+        // 获取用户信息
+        getUserInfo(){
+          let that = this
+          if (that.userId) {
+            $.ajax({
+              url: that.baseUrl + "/sysuser/detail",
+              type: "GET",
+              data: {id: that.userId},
+              success: function (data) {
+                if (data.code !== 500) {
+                  that.userInfo = data.Data
+                }
+              },
+              error: function () {
+                console.log("获取用户信息失败")
+              }
+            });
+          }
+        }
       },
       watch: {},
       mounted() {
         let that = this;
-
+        that.getUserInfo()
       }
     })
 

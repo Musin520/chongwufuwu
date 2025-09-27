@@ -80,5 +80,16 @@ public class CompanyController extends BaseController {
         return AjaxResult.ok(this.companyService.deleteById(id));
     }
 
+    /**
+     * 根据创建者ID查询服务商信息
+     *
+     * @param createid 创建者ID（用户ID）
+     * @return 服务商信息
+     */
+    @GetMapping("byCreateId")
+    public AjaxResult queryByCreateId(Integer createid) {
+        return AjaxResult.ok(this.companyService.queryByCreateId(createid));
+    }
+
 }
 

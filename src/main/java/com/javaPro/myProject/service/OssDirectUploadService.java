@@ -21,7 +21,7 @@ import java.util.UUID;
 @Service
 public class OssDirectUploadService {
     
-    @Autowired
+    @Autowired(required = false)
     private OSS ossClient;
     
     @Value("${oss.endpoint}")
@@ -41,6 +41,10 @@ public class OssDirectUploadService {
      * @return 包含签名信息的Map
      */
     public Map<String, Object> getOssSignature() {
+        if (ossClient == null) {
+            throw new RuntimeException("OSS客户端未配置，无法获取签名");
+        }
+
         try {
             // 设置上传回调URL（可选）
             String host = urlPrefix;

@@ -117,7 +117,9 @@
           <div class="col-sm-4 col-lg-2 text-center text-sm-start d-flex gap-3 justify-content-center justify-content-md-start">
             <div class="d-flex align-items-center my-3 my-sm-0">
               <a href="/web/userindex">
-                <img src="/static/webSite/images/logo.png" style="width: 50px;height: 50px;" alt="logo" class="img-fluid">
+                <img v-if="userInfo && userInfo.img" :src="userInfo.img" alt="用户头像" class="img-fluid"
+                     style="width: 50px;height: 50px; border-radius: 50%; border: 2px solid #007bff;">
+                <img v-else src="/static/webSite/images/logo.png" style="width: 50px;height: 50px;" alt="logo" class="img-fluid">
               </a>
             </div>
             <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar"
@@ -189,72 +191,140 @@
 
     <div class="py-4">
       <div class="container-lg">
-        <div class="row g-5">
-          <aside class="col-md-2">
-            <div class="sidebar">
-              <div class="widget-menu">
-                <div class="widget-search-bar">
-                  <form role="search" method="get" class="d-flex position-relative">
-                    <div class="d-flex mt-3 gap-0">
-                      <input v-model="queryParams.productname" class="form-control form-control-lg rounded-2 bg-light" type="text" placeholder="根据名称搜索" aria-label="Search here" @keyup.enter="handleSearch">
-                      <button class="btn bg-transparent position-absolute end-0" @click="handleSearch" type="button"><i class="fa fa-search"></i></button>
-                    </div>
-                  </form>
-                </div>
+        <!-- 筛选功能区域 -->
+        <div class="filter-section mb-4">
+          <div class="card">
+            <div class="card-header">
+              <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                  <i class="fa fa-filter"></i> 筛选条件
+                </h5>
+                <button class="btn btn-outline-primary btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#filterCollapse" aria-expanded="true" aria-controls="filterCollapse">
+                  <i class="fa fa-chevron-down"></i> 展开/收起
+                </button>
               </div>
-              <div class="widget-product-categories pt-5">
-                <h5 class="widget-title">种类</h5>
-                <ul class="product-categories sidebar-list list-unstyled">
-                  <li class="cat-item" >
-                    <a href="javascript:void(0)" @click="getList('all')" class="nav-link">全部</a>
-                  </li>
-                  <li class="cat-item" v-for="item in producttypeList">
-                    <a href="javascript:void(0)" @click="getList(item.id)" class="nav-link">{{item.typeName}}</a>
-                  </li>
-                </ul>
-              </div>
-
-              <!-- 时间段筛选 -->
-              <div class="widget-product-categories pt-5">
-                <h5 class="widget-title">服务时间段</h5>
-                <div class="time-filter">
-                  <div class="mb-3">
-                    <label class="form-label">开始时间</label>
-                    <input v-model="queryParams.serviceStartTime" type="time" class="form-control" @change="handleTimeFilter">
-                  </div>
-                  <div class="mb-3">
-                    <label class="form-label">结束时间</label>
-                    <input v-model="queryParams.serviceEndTime" type="time" class="form-control" @change="handleTimeFilter">
-                  </div>
-                </div>
-              </div>
-
-              <!-- 评分筛选 -->
-              <div class="widget-product-categories pt-5">
-                <h5 class="widget-title">服务商评分</h5>
-                <ul class="rating-filter sidebar-list list-unstyled">
-                  <li class="cat-item">
-                    <a href="javascript:void(0)" @click="handleRatingFilter('all')" class="nav-link">全部评分</a>
-                  </li>
-                  <li class="cat-item">
-                    <a href="javascript:void(0)" @click="handleRatingFilter(4.5)" class="nav-link">4.5分以上</a>
-                  </li>
-                  <li class="cat-item">
-                    <a href="javascript:void(0)" @click="handleRatingFilter(4.0)" class="nav-link">4.0分以上</a>
-                  </li>
-                  <li class="cat-item">
-                    <a href="javascript:void(0)" @click="handleRatingFilter(3.5)" class="nav-link">3.5分以上</a>
-                  </li>
-                  <li class="cat-item">
-                    <a href="javascript:void(0)" @click="handleRatingFilter(3.0)" class="nav-link">3.0分以上</a>
-                  </li>
-                </ul>
-              </div>
-
             </div>
-          </aside>
+            <div class="collapse show" id="filterCollapse">
+              <div class="card-body">
+                <div class="row g-3">
+                  <!-- 搜索框 -->
+                  <div class="col-md-3">
+                    <label class="form-label">名称搜索</label>
+                    <div class="input-group">
+                      <input v-model="queryParams.productname" class="form-control" type="text" placeholder="根据名称搜索" @keyup.enter="handleSearch">
+                      <button class="btn btn-outline-secondary" @click="handleSearch" type="button">
+                        <i class="fa fa-search"></i>
+                      </button>
+                    </div>
+                  </div>
+                  <!-- 种类筛选 -->
+                  <div class="col-md-3">
+                    <label class="form-label">服务种类</label>
+                    <select class="form-select" v-model="selectedCategory" @change="handleCategoryChange">
+                      <option value="all">全部种类</option>
+                      <option v-for="item in producttypeList" :key="item.id" :value="item.id">
+                        {{item.typeName}}
+                      </option>
+                    </select>
+                  </div>
 
-          <main class="col-md-10">
+                  <!-- 时间段筛选 -->
+                  <div class="col-md-3">
+                    <label class="form-label">服务时间段</label>
+                    <select class="form-select" v-model="selectedTimeSlot" @change="handleTimeSlotChange">
+                      <option value="">全部时间</option>
+                      <option value="morning">上午 (08:00-12:00)</option>
+                      <option value="afternoon">下午 (12:00-18:00)</option>
+                      <option value="evening">晚上 (18:00-22:00)</option>
+                      <option value="allday">全天 (08:00-22:00)</option>
+                    </select>
+                  </div>
+
+                  <!-- 评分筛选 -->
+                  <div class="col-md-3">
+                    <label class="form-label">服务商评分</label>
+                    <select class="form-select" v-model="selectedRating" @change="handleRatingChange">
+                      <option value="">全部评分</option>
+                      <option value="4.5">4.5分以上</option>
+                      <option value="4.0">4.0分以上</option>
+                      <option value="3.5">3.5分以上</option>
+                      <option value="3.0">3.0分以上</option>
+                    </select>
+                  </div>
+                </div>
+
+                <!-- 高级筛选折叠区域 -->
+                <div class="row mt-3">
+                  <div class="col-12">
+                    <button class="btn btn-outline-info btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#advancedFilter" aria-expanded="false" aria-controls="advancedFilter">
+                      <i class="fa fa-cog"></i> 高级筛选
+                    </button>
+                  </div>
+                </div>
+
+                <div class="collapse mt-3" id="advancedFilter">
+                  <div class="card card-body">
+                    <div class="row g-3">
+
+                      <!-- 自定义时间段筛选 -->
+                      <div class="col-md-6">
+                        <label class="form-label">自定义时间筛选</label>
+                        <div class="row g-2">
+                          <div class="col-6">
+                            <div class="input-group input-group-sm">
+                              <span class="input-group-text">
+                                <i class="fa fa-clock-o"></i>
+                              </span>
+                              <input type="time" class="form-control" v-model="customTimeRange.start" placeholder="开始时间">
+                            </div>
+                          </div>
+                          <div class="col-6">
+                            <div class="input-group input-group-sm">
+                              <span class="input-group-text">
+                                <i class="fa fa-clock-o"></i>
+                              </span>
+                              <input type="time" class="form-control" v-model="customTimeRange.end" placeholder="结束时间">
+                            </div>
+                          </div>
+                        </div>
+                        <div class="mt-2">
+                          <button type="button" class="btn btn-primary btn-sm me-2" @click="handleCustomTimeFilter">
+                            <i class="fa fa-filter"></i> 应用
+                          </button>
+                          <button type="button" class="btn btn-outline-secondary btn-sm" @click="clearCustomTimeFilter">
+                            <i class="fa fa-times"></i> 清除
+                          </button>
+                        </div>
+                        <div v-if="customTimeRange.start && customTimeRange.end" class="mt-2">
+                          <small class="text-muted">
+                            筛选时间段: {{customTimeRange.start}} - {{customTimeRange.end}}
+                          </small>
+                        </div>
+                      </div>
+
+                      <!-- 操作按钮 -->
+                      <div class="col-md-6">
+                        <label class="form-label">操作</label>
+                        <div class="d-flex gap-2">
+                          <button type="button" class="btn btn-success" @click="handleSearch">
+                            <i class="fa fa-search"></i> 搜索
+                          </button>
+                          <button type="button" class="btn btn-secondary" @click="handleResetFilter">
+                            <i class="fa fa-refresh"></i> 重置
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 产品列表区域 -->
+        <div class="row">
+          <div class="col-12">
             <div class="filter-shop d-flex justify-content-between">
               <div class="showing-product">
                 <p>全部道具宠物服务数据</p>
@@ -465,6 +535,14 @@
           serviceEndTime: '',
           companyRating: null,
         },
+        customTimeRange: {
+          start: '',
+          end: ''
+        },
+        // 新增筛选变量
+        selectedCategory: 'all',
+        selectedTimeSlot: '',
+        selectedRating: '',
         title: "",
         rules: {
           title: [
@@ -629,12 +707,166 @@
         that.queryParams.pageNum = 1; // 重置到第一页
         that.getList();
       },
+      // 处理预设时间段筛选
+      handlePresetTimeFilter(event) {
+        let that = this;
+        const value = event.target.value;
+        switch(value) {
+          case 'morning':
+            that.queryParams.serviceStartTime = '08:00';
+            that.queryParams.serviceEndTime = '12:00';
+            break;
+          case 'afternoon':
+            that.queryParams.serviceStartTime = '12:00';
+            that.queryParams.serviceEndTime = '18:00';
+            break;
+          case 'evening':
+            that.queryParams.serviceStartTime = '18:00';
+            that.queryParams.serviceEndTime = '22:00';
+            break;
+          case 'allday':
+            that.queryParams.serviceStartTime = '08:00';
+            that.queryParams.serviceEndTime = '22:00';
+            break;
+          default:
+            // 不做任何操作，保持当前时间设置
+            return;
+        }
+        that.queryParams.pageNum = 1; // 重置到第一页
+        that.getList();
+      },
+      // 清除时间筛选
+      clearTimeFilter() {
+        let that = this;
+        that.queryParams.serviceStartTime = '';
+        that.queryParams.serviceEndTime = '';
+        that.queryParams.pageNum = 1; // 重置到第一页
+        that.getList();
+      },
+      // 处理快速时间段筛选
+      handleQuickTimeFilter(timeType) {
+        let that = this;
+        switch(timeType) {
+          case 'morning':
+            that.queryParams.serviceStartTime = '08:00';
+            that.queryParams.serviceEndTime = '12:00';
+            break;
+          case 'afternoon':
+            that.queryParams.serviceStartTime = '12:00';
+            that.queryParams.serviceEndTime = '18:00';
+            break;
+          case 'evening':
+            that.queryParams.serviceStartTime = '18:00';
+            that.queryParams.serviceEndTime = '22:00';
+            break;
+          case 'allday':
+            that.queryParams.serviceStartTime = '08:00';
+            that.queryParams.serviceEndTime = '22:00';
+            break;
+          case 'clear':
+            that.queryParams.serviceStartTime = '';
+            that.queryParams.serviceEndTime = '';
+            break;
+          default:
+            that.queryParams.serviceStartTime = '';
+            that.queryParams.serviceEndTime = '';
+            break;
+        }
+        that.queryParams.pageNum = 1; // 重置到第一页
+        that.getList();
+      },
       // 处理评分筛选
       handleRatingFilter(rating) {
         let that = this;
         that.queryParams.companyRating = rating === 'all' ? null : rating;
         that.queryParams.pageNum = 1; // 重置到第一页
         that.getList();
+      },
+
+      // 新增筛选方法
+      handleCategoryChange() {
+        let that = this;
+        if (that.selectedCategory === 'all') {
+          that.getList('all');
+        } else {
+          that.getList(that.selectedCategory);
+        }
+      },
+
+      handleTimeSlotChange() {
+        let that = this;
+        that.handleQuickTimeFilter(that.selectedTimeSlot);
+      },
+
+      handleRatingChange() {
+        let that = this;
+        that.queryParams.companyRating = that.selectedRating ? parseFloat(that.selectedRating) : null;
+        that.queryParams.pageNum = 1;
+        that.getList();
+      },
+
+      handleResetFilter() {
+        let that = this;
+        that.selectedCategory = 'all';
+        that.selectedTimeSlot = '';
+        that.selectedRating = '';
+        that.queryParams.productname = '';
+        that.queryParams.serviceStartTime = '';
+        that.queryParams.serviceEndTime = '';
+        that.queryParams.companyRating = null;
+        that.customTimeRange.start = '';
+        that.customTimeRange.end = '';
+        that.queryParams.pageNum = 1;
+        that.getList('all');
+      },
+
+      // 处理自定义时间筛选输入变化
+      handleCustomTimeFilter() {
+        // 实时验证时间范围
+        let that = this;
+        if (that.customTimeRange.start && that.customTimeRange.end) {
+          if (that.customTimeRange.start >= that.customTimeRange.end) {
+            toastr.warning("开始时间必须小于结束时间", '提示');
+            return;
+          }
+        }
+      },
+
+      // 应用自定义时间筛选
+      applyCustomTimeFilter() {
+        let that = this;
+
+        if (!that.customTimeRange.start || !that.customTimeRange.end) {
+          toastr.error("请选择完整的时间范围", '提示');
+          return;
+        }
+
+        if (that.customTimeRange.start >= that.customTimeRange.end) {
+          toastr.error("开始时间必须小于结束时间", '提示');
+          return;
+        }
+
+        // 设置查询参数
+        that.queryParams.serviceStartTime = that.customTimeRange.start;
+        that.queryParams.serviceEndTime = that.customTimeRange.end;
+        that.queryParams.pageNum = 1; // 重置到第一页
+
+        // 执行搜索
+        that.getList();
+
+        toastr.success(`已筛选 ${that.customTimeRange.start} - ${that.customTimeRange.end} 时间段的服务`, '筛选成功');
+      },
+
+      // 清除自定义时间筛选
+      clearCustomTimeFilter() {
+        let that = this;
+        that.customTimeRange.start = '';
+        that.customTimeRange.end = '';
+        that.queryParams.serviceStartTime = '';
+        that.queryParams.serviceEndTime = '';
+        that.queryParams.pageNum = 1; // 重置到第一页
+        that.getList();
+        toastr.info("已清除时间筛选", '提示');
       },
 
       // 获取列表

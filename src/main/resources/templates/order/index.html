@@ -199,6 +199,10 @@
                                                        v-if="role !== '2' && !scope.row.remark"
                                                        type="primary"><i class="fa fa-pencil"></i> 备注
                                             </el-button>
+                                            <el-button @click="handleEvaluate(scope.row)" round size="small"
+                                                       v-if="role === '2' && !scope.row.content"
+                                                       type="success"><i class="fa fa-star"></i> 评价
+                                            </el-button>
                                         </template>
                                     </el-table-column>
                                 </el-table>
@@ -274,6 +278,52 @@
             <el-button @click="openDetail = false">关闭</el-button>
         </div>
     </el-dialog>
+
+    <!-- 评价对话框 -->
+    <el-dialog title="订单评价" :visible.sync="openEvaluate" width="500px">
+        <el-form :model="evaluateForm" label-width="80px">
+            <el-form-item label="服务评分">
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <el-rate
+                        v-model="evaluateForm.rating"
+                        :max="5"
+                        allow-half
+                        show-text
+                        :texts="['极差', '失望', '一般', '满意', '惊喜']"
+                        :colors="['#F7BA2A', '#F7BA2A', '#F7BA2A']"
+                        :disabled-void-color="'#C6D1DE'"
+                        :void-color="'#C6D1DE'"
+                        :text-color="'#1F2D3D'"
+                        @change="onRatingChange"
+                        @click.native="handleRatingClick">
+                    </el-rate>
+                    <div style="display: flex; align-items: center; gap: 8px; min-width: 60px;">
+                        <span style="color: #409EFF; font-size: 18px; font-weight: bold;">
+                            {{ formatRatingDisplay(evaluateForm.rating) }}
+                        </span>
+                        <span style="color: #606266; font-size: 14px;">分</span>
+                    </div>
+                </div>
+                <div style="margin-top: 8px; color: #909399; font-size: 12px;">
+                    请点击星星为服务商的服务质量打分（点击固定星数，半颗星=0.5分，一颗星=1分）
+                </div>
+            </el-form-item>
+            <el-form-item label="评价内容">
+                <el-input
+                    type="textarea"
+                    :rows="4"
+                    placeholder="请详细描述您对本次服务的感受和建议..."
+                    v-model="evaluateForm.content"
+                    maxlength="200"
+                    show-word-limit>
+                </el-input>
+            </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+            <el-button @click="openEvaluate = false">取消</el-button>
+            <el-button type="primary" @click="submitEvaluate" :disabled="!evaluateForm.rating || evaluateForm.rating < 0.5">提交评价</el-button>
+        </div>
+    </el-dialog>
 </div>
 
 
@@ -314,6 +364,14 @@
                 open: false,
                 openRemark: false,
                 openDetail: false,
+                openEvaluate: false,
+                evaluateForm: {
+                    rating: 0.5,
+                    content: '',
+                    orderid: null,
+                    userid: null,
+                    companyid: null
+                },
                 queryParams: {
                     pageSize: 3,
                     pageNum: 1,
@@ -554,6 +612,149 @@
                 let that = this;
                 that.getList()
             },
+
+            // 处理评价
+            handleEvaluate(row) {
+                this.evaluateForm = {
+                    rating: 0.5,
+                    content: '',
+                    orderid: row.id,
+                    userid: this.userId,
+                    companyid: null // 需要从订单中获取服务商ID
+                };
+
+                // 获取订单对应的服务商ID
+                this.getOrderCompanyId(row.id);
+                this.openEvaluate = true;
+            },
+
+            // 获取订单对应的服务商ID
+            getOrderCompanyId(orderId) {
+                let that = this;
+                $.ajax({
+                    url: that.baseUrl + "/order/detail",
+                    type: "GET",
+                    data: { id: orderId },
+                    success: function (data) {
+                        if (data.code !== 500 && data.Data && data.Data.cartList && data.Data.cartList.length > 0) {
+                            // 从购物车商品中获取服务商ID
+                            that.evaluateForm.companyid = data.Data.cartList[0].product.companyid;
+                        }
+                    },
+                    error: function () {
+                        console.error("获取订单详情失败");
+                    }
+                });
+            },
+
+            // 评分变化处理（星星点击）
+            onRatingChange(value) {
+                // 确保评分值正确更新，并且不能为0
+                if (value === 0) {
+                    this.evaluateForm.rating = 0.5;
+                } else {
+                    // 确保是0.5的倍数，实现半颗星=0.5分，一颗星=1分
+                    let rounded = Math.round(value * 2) / 2;
+                    this.evaluateForm.rating = Math.max(0.5, Math.min(5, rounded));
+                }
+
+                // 强制更新组件显示，确保星星固定在点击位置
+                this.$nextTick(() => {
+                    this.$forceUpdate();
+                });
+
+                console.log('当前评分：' + this.evaluateForm.rating + '分 (' + this.getStarDescription(this.evaluateForm.rating) + ')');
+            },
+
+            // 处理星星点击事件，确保点击固定
+            handleRatingClick(event) {
+                // 阻止事件冒泡，确保点击行为正确
+                event.stopPropagation();
+            },
+
+            // 格式化评分显示
+            formatRatingDisplay(rating) {
+                if (!rating || rating === 0) {
+                    return '0';
+                }
+                // 如果是整数，显示整数；如果是小数，显示一位小数
+                return rating % 1 === 0 ? rating.toString() : rating.toFixed(1);
+            },
+
+            // 获取星数描述
+            getStarDescription(rating) {
+                if (!rating) return '未评分';
+                const fullStars = Math.floor(rating);
+                const hasHalfStar = rating % 1 !== 0;
+
+                let description = '';
+                if (fullStars > 0) {
+                    description += fullStars + '颗星';
+                }
+                if (hasHalfStar) {
+                    description += (fullStars > 0 ? '半' : '半颗星');
+                }
+                return description;
+            },
+
+            // 提交评价
+            submitEvaluate() {
+                let that = this;
+
+                // 验证评分
+                if (!that.evaluateForm.rating || that.evaluateForm.rating < 0.5) {
+                    toastr.error("请点击星星进行评分", '提示');
+                    return;
+                }
+
+                if (!that.evaluateForm.content.trim()) {
+                    toastr.error("请输入评价内容", '提示');
+                    return;
+                }
+
+                $.ajax({
+                    url: that.baseUrl + "/orderEvalute",
+                    type: "POST",
+                    data: that.evaluateForm,
+                    success: function (data) {
+                        that.openEvaluate = false;
+                        if (data.code === 200) {
+                            toastr.success("评价提交成功", '提示');
+                            that.getList(); // 刷新列表
+
+                            // 如果评价成功且有评分统计信息，通知其他页面更新
+                            if (data.avgRating !== undefined && data.companyid) {
+                                // 使用localStorage存储评分更新事件
+                                const ratingUpdateEvent = {
+                                    companyid: data.companyid,
+                                    avgRating: data.avgRating,
+                                    ratingCount: data.ratingCount,
+                                    timestamp: new Date().getTime()
+                                };
+                                localStorage.setItem('ratingUpdate', JSON.stringify(ratingUpdateEvent));
+
+                                // 触发storage事件通知其他页面
+                                window.dispatchEvent(new StorageEvent('storage', {
+                                    key: 'ratingUpdate',
+                                    newValue: JSON.stringify(ratingUpdateEvent)
+                                }));
+
+                                // 触发同页面内的评分更新事件
+                                window.dispatchEvent(new CustomEvent('ratingUpdated', {
+                                    detail: ratingUpdateEvent
+                                }));
+                            }
+                        } else {
+                            toastr.error(data.msg, '提示');
+                        }
+                    },
+                    error: function () {
+                        toastr.error("评价提交失败", '提示');
+                    }
+                });
+            },
+
+
 
 
         },

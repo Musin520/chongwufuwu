@@ -75,4 +75,16 @@ public class MessageServiceImpl implements MessageService {
     public boolean deleteById(Integer id) {
         return this.messageDao.deleteById(id) > 0;
     }
+
+    /**
+     * 获取聊天记录
+     *
+     * @param userId 当前用户ID
+     * @param partnerId 聊天对象ID
+     * @return 聊天记录列表
+     */
+    @Override
+    public List<Message> getChatMessages(Integer userId, Integer partnerId) {
+        return this.messageDao.getChatMessages(userId, partnerId);
+    }
 }

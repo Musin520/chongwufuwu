@@ -78,5 +78,14 @@ public interface MessageDao {
      */
     int deleteById(Integer id);
 
+    /**
+     * 获取聊天记录
+     *
+     * @param userId 当前用户ID
+     * @param partnerId 聊天对象ID
+     * @return 聊天记录列表
+     */
+    List<Message> getChatMessages(@Param("userId") Integer userId, @Param("partnerId") Integer partnerId);
+
 }
 

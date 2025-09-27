@@ -73,4 +73,19 @@ public class OrderEvaluteServiceImpl implements OrderEvaluteService {
     public boolean deleteById(Integer id) {
         return this.orderEvaluteDao.deleteById(id) > 0;
     }
+
+    @Override
+    public Double getAvgRatingByCompanyId(Integer companyid) {
+        return this.orderEvaluteDao.getAvgRatingByCompanyId(companyid);
+    }
+
+    @Override
+    public Integer getRatingCountByCompanyId(Integer companyid) {
+        return this.orderEvaluteDao.getRatingCountByCompanyId(companyid);
+    }
+
+    @Override
+    public List<OrderEvalute> queryByCompanyId(Integer companyid) {
+        return this.orderEvaluteDao.queryByCompanyId(companyid);
+    }
 }

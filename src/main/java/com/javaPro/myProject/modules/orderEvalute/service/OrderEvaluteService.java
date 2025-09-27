@@ -48,4 +48,28 @@ public interface OrderEvaluteService {
      */
     boolean deleteById(Integer id);
 
+    /**
+     * 计算服务商的平均评分
+     *
+     * @param companyid 服务商ID
+     * @return 平均评分
+     */
+    Double getAvgRatingByCompanyId(Integer companyid);
+
+    /**
+     * 获取服务商的评价总数
+     *
+     * @param companyid 服务商ID
+     * @return 评价总数
+     */
+    Integer getRatingCountByCompanyId(Integer companyid);
+
+    /**
+     * 根据服务商ID查询评价列表
+     *
+     * @param companyid 服务商ID
+     * @return 评价列表
+     */
+    List<OrderEvalute> queryByCompanyId(Integer companyid);
+
 }

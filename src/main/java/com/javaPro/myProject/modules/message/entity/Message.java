@@ -42,6 +42,8 @@ public class Message implements Serializable {
     private String status;
     private String senderName;
     private String receiverName;
+    private String senderRole;
+    private String receiverRole;
 
 
 }
