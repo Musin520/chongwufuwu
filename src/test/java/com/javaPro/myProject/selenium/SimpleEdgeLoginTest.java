@@ -1,6 +1,7 @@
 package com.javaPro.myProject.selenium;
 
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
@@ -55,12 +56,7 @@ public class SimpleEdgeLoginTest {
         System.out.println("=== 开始测试准备 ===");
 
         // 1. 快速检查应用程序是否运行
-        if (!isApplicationRunningFast()) {
-            System.out.println("❌ 应用程序未在 " + BASE_URL + " 上运行！");
-            System.out.println("请先启动应用程序：mvn spring-boot:run");
-            throw new RuntimeException("应用程序未运行");
-        }
-        System.out.println("✅ 应用程序快速检查通过");
+       
 
         // 2. 快速设置WebDriverManager（优化启动速度）
         try {

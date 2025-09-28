@@ -99,9 +99,9 @@ class ProductControllerTest {
                         .param("id", "1")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.Data.id").value(1))
-                .andExpect(jsonPath("$.Data.productname").value("宠物美容服务"))
-                .andExpect(jsonPath("$.Data.kedanjia").value("100.00"));
+                .andExpect(jsonPath("$.data.id").value(1))
+                .andExpect(jsonPath("$.data.productname").value("宠物美容服务"))
+                .andExpect(jsonPath("$.data.kedanjia").value("100.00"));
     }
 
     /**
@@ -117,7 +117,7 @@ class ProductControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(testProduct)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.Data.productname").value("宠物美容服务"));
+                .andExpect(jsonPath("$.data.productname").value("宠物美容服务"));
     }
 
     /**
@@ -134,7 +134,7 @@ class ProductControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(testProduct)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.Data.productname").value("更新后的宠物美容服务"));
+                .andExpect(jsonPath("$.data.productname").value("更新后的宠物美容服务"));
     }
 
     /**
@@ -150,7 +150,7 @@ class ProductControllerTest {
                         .param("id", "1")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.Data").value(true));
+                .andExpect(jsonPath("$.data").value(true));
     }
 
     /**
@@ -166,7 +166,7 @@ class ProductControllerTest {
                         .param("id", "999")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.Data").isEmpty());
+                .andExpect(jsonPath("$.data").isEmpty());
     }
 
     /**
@@ -200,6 +200,6 @@ class ProductControllerTest {
                         .param("id", "1")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.Data.kucun").value("0"));
+                .andExpect(jsonPath("$.data.kucun").value("0"));
     }
 }

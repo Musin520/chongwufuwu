@@ -19,16 +19,16 @@ public class AjaxResult extends HashMap<String,Object> {
     /**
      * 数据
      */
-    private Object Data;
+    private Object data;
 
     AjaxResult(int code, String msg){
         super.put("code",code);
         super.put("msg",msg);
     }
-    AjaxResult(int code, String msg, Object Data){
+    AjaxResult(int code, String msg, Object data){
         super.put("code",code);
         super.put("msg",msg);
-        super.put("Data",Data);
+        super.put("data",data);
     }
 
     public AjaxResult() {
@@ -44,11 +44,11 @@ public class AjaxResult extends HashMap<String,Object> {
     public static AjaxResult ok(String msg){
         return new AjaxResult(200,msg);
     }
-    public static AjaxResult ok(String msg ,Object Data){
-        return new AjaxResult(200,msg,Data);
+    public static AjaxResult ok(String msg ,Object data){
+        return new AjaxResult(200,msg,data);
     }
-    public static AjaxResult ok(Object Data){
-        return new AjaxResult(200,"操作成功",Data);
+    public static AjaxResult ok(Object data){
+        return new AjaxResult(200,"操作成功",data);
     }
     /**
      *增删改失败
@@ -59,14 +59,14 @@ public class AjaxResult extends HashMap<String,Object> {
     public static AjaxResult error(String msg){
         return new AjaxResult(500,msg);
     }
-    public static AjaxResult error(String msg ,Object Data){
-        return new AjaxResult(500,msg,Data);
+    public static AjaxResult error(String msg ,Object data){
+        return new AjaxResult(500,msg,data);
     }
     /**
      * 自定义code
      */
-    public static AjaxResult other(int code,String msg ,Object Data){
-        return new AjaxResult(code,msg,Data);
+    public static AjaxResult other(int code,String msg ,Object data){
+        return new AjaxResult(code,msg,data);
     }
     /**
      * 自动根据int类型判断成功还是错误信息

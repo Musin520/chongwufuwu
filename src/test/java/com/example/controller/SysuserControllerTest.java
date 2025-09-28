@@ -77,7 +77,7 @@ class SysuserControllerTest {
                 .param("id", "1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200))
-                .andExpect(jsonPath("$.Data.account").value("testuser"));
+                .andExpect(jsonPath("$.data.account").value("testuser"));
     }
     
     @Test

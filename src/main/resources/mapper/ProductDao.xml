@@ -343,18 +343,18 @@ order by createtime desc
         UPDATE product
         SET
             service_start_time = CASE
-                WHEN MOD(id, 4) = 0 THEN '08:00'
-                WHEN MOD(id, 4) = 1 THEN '12:00'
-                WHEN MOD(id, 4) = 2 THEN '18:00'
-                ELSE '08:00'
+                WHEN (id % 4) = 0 THEN TIME '08:00:00'
+                WHEN (id % 4) = 1 THEN TIME '12:00:00'
+                WHEN (id % 4) = 2 THEN TIME '18:00:00'
+                ELSE TIME '08:00:00'
             END,
             service_end_time = CASE
-                WHEN MOD(id, 4) = 0 THEN '12:00'
-                WHEN MOD(id, 4) = 1 THEN '18:00'
-                WHEN MOD(id, 4) = 2 THEN '22:00'
-                ELSE '22:00'
+                WHEN (id % 4) = 0 THEN TIME '12:00:00'
+                WHEN (id % 4) = 1 THEN TIME '18:00:00'
+                WHEN (id % 4) = 2 THEN TIME '22:00:00'
+                ELSE TIME '22:00:00'
             END
-        WHERE service_start_time IS NULL OR service_end_time IS NULL OR service_start_time = '' OR service_end_time = ''
+        WHERE service_start_time IS NULL OR service_end_time IS NULL
     </update>
 
 </mapper>

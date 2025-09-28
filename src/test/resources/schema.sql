@@ -35,6 +35,9 @@ CREATE TABLE IF NOT EXISTS company (
     createtime TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     status VARCHAR(20) DEFAULT 'active',
     userid BIGINT,
+    avg_rating DECIMAL(3,2) DEFAULT 4.5,
+    rating_count INT DEFAULT 0,
+    service_area VARCHAR(200) DEFAULT '全市',
     FOREIGN KEY (userid) REFERENCES sysuser(id)
 );
 
@@ -42,6 +45,7 @@ CREATE TABLE IF NOT EXISTS company (
 CREATE TABLE IF NOT EXISTS producttype (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     typename VARCHAR(50) NOT NULL,
+    type_name VARCHAR(50) NOT NULL,
     typedescription VARCHAR(200),
     createtime TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -50,19 +54,26 @@ CREATE TABLE IF NOT EXISTS producttype (
 CREATE TABLE IF NOT EXISTS product (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     productname VARCHAR(100) NOT NULL,
-    productdescription TEXT,
-    productprice DECIMAL(10,2) NOT NULL,
-    productimg VARCHAR(500),
-    productdetailimg TEXT,
-    productstatus VARCHAR(20) DEFAULT 'active',
-    createtime TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    productdes TEXT,
+    img VARCHAR(500),
+    chengben DECIMAL(10,2) DEFAULT 0.00,
+    kedanjia DECIMAL(10,2) NOT NULL,
+    kucun INT DEFAULT 0,
+    fahuotianshu INT DEFAULT 0,
+    chandi VARCHAR(100),
+    guige VARCHAR(100),
     companyid BIGINT,
-    typeid BIGINT,
-    service_start_time TIME,
-    service_end_time TIME,
-    rating DECIMAL(3,2) DEFAULT 0.00,
+    createtime TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    status VARCHAR(20) DEFAULT 'active',
+    updatetime TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    producttype BIGINT,
+    spare1 VARCHAR(200),
+    spare2 VARCHAR(200),
+    detailimg TEXT,
+    service_start_time TIME DEFAULT '08:00:00',
+    service_end_time TIME DEFAULT '22:00:00',
     FOREIGN KEY (companyid) REFERENCES company(id),
-    FOREIGN KEY (typeid) REFERENCES producttype(id)
+    FOREIGN KEY (producttype) REFERENCES producttype(id)
 );
 
 -- 创建订单表

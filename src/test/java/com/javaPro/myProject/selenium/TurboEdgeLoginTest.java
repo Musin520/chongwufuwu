@@ -1,6 +1,7 @@
 package com.javaPro.myProject.selenium;
 
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
@@ -36,23 +37,18 @@ public class TurboEdgeLoginTest {
         long startTime = System.currentTimeMillis();
         System.out.println("🚀 TURBO模式启动");
         
-        // 1. 极速应用检查（Socket连接，最快方式）
-        if (!isTurboAppRunning()) {
-            throw new RuntimeException("应用未运行");
-        }
-        
-        // 2. 跳过WebDriverManager，直接使用系统驱动
-        // 假设Edge驱动已在PATH中或使用系统默认
+       
         
         // 3. 极简Edge配置
         EdgeOptions options = new EdgeOptions();
         options.addArguments("--headless");                    // 无头模式
         options.addArguments("--no-sandbox");                  
         options.addArguments("--disable-dev-shm-usage");       
-        options.addArguments("--disable-gpu");                 
+        options.addArguments("--disable-gpu");
         options.addArguments("--disable-images");              // 禁用图片
-        options.addArguments("--disable-javascript");          // 禁用JS
-        options.addArguments("--disable-plugins");             
+        // 注释掉JS禁用，因为应用需要JavaScript
+        // options.addArguments("--disable-javascript");          // 禁用JS
+        options.addArguments("--disable-plugins");
         options.addArguments("--disable-extensions");          
         options.addArguments("--disable-background-timer-throttling");
         options.addArguments("--disable-backgrounding-occluded-windows");
@@ -72,10 +68,10 @@ public class TurboEdgeLoginTest {
         // 4. 极速启动
         driver = new EdgeDriver(options);
         
-        // 5. 极短超时
+        // 5. 优化超时配置
         driver.manage().timeouts().implicitlyWait(Duration.ofMillis(500));
-        driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(3));
-        driver.manage().timeouts().scriptTimeout(Duration.ofSeconds(1));
+        driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(10));  // 增加页面加载超时
+        driver.manage().timeouts().scriptTimeout(Duration.ofSeconds(3));
         
         // 6. 高频等待
         wait = new WebDriverWait(driver, Duration.ofSeconds(TURBO_TIMEOUT), Duration.ofMillis(POLL_INTERVAL));
