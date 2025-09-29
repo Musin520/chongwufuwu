@@ -140,8 +140,8 @@
                     console.log(data)
                     let str = ``
                     let Data = []
-                    for (let i = 0; i < data.Data.topMap.length; i++) {
-                        let item = data.Data.topMap[i]
+                    for (let i = 0; i < data.data.topMap.length; i++) {
+                        let item = data.data.topMap[i]
                         str += `<br>
                         <h4>${item.name} ： <strong >${item.percent}</strong></h4>
                         <br>`
@@ -160,7 +160,7 @@
                     });
                     Morris.Line({
                         element: 'morris-one-line-chart',
-                        data: data.Data.bottomMap,
+                        data: data.data.bottomMap,
                         xkey: 'period',
                         ykeys: ['licensed'],
                         resize: true,
@@ -171,7 +171,7 @@
                     });
                     Morris.Bar({
                         element: 'morris-bar-chart',
-                        data: data.Data.thirdMap,
+                        data: data.data.thirdMap,
                         xkey: 'period',
                         ykeys: ['a', 'b'],
                         labels: ['已回复', '未回复'],

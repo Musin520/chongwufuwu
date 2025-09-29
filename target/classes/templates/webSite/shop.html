@@ -689,6 +689,16 @@
 
             </div>
 
+            <!-- Debug Info -->
+            <div class="alert alert-info" v-if="dataList.length === 0">
+              <h5>调试信息:</h5>
+              <p>数据列表长度: {{dataList.length}}</p>
+              <p>总数: {{total}}</p>
+              <p>加载状态: {{loading}}</p>
+              <p>用户ID: {{userId}}</p>
+              <p>Base URL: {{baseUrl}}</p>
+            </div>
+
             <div class="product-grid row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-3 row-cols-xl-4 row-cols-xxl-5">
 
               <div class="col" v-for="item in dataList">
@@ -704,9 +714,9 @@
                     销量：<span>{{item.spare1}}</span>
                     </div>
                     <div class="d-flex justify-content-center align-items-center gap-2">
-                      <span>￥ {{item.kedanjia}}</span>
-                      <span class="text-dark fw-semibold">{{parseFloat(item.kedanjia) * parseFloat(item.spare2) /10 }}</span>
-                      <span class="badge border border-dark-subtle rounded-0 fw-normal px-1 fs-7 lh-1 text-body-tertiary">{{item.spare2}}折</span>
+                      <del v-if="item.spare2 && !isNaN(parseFloat(item.spare2)) && parseFloat(item.spare2) < 10" class="text-muted">￥ {{item.kedanjia}}</del>
+                      <span class="text-dark fw-semibold">￥ {{calculateItemPrice(item)}}</span>
+                      <span v-if="item.spare2 && !isNaN(parseFloat(item.spare2)) && parseFloat(item.spare2) < 10" class="badge border border-dark-subtle rounded-0 fw-normal px-1 fs-7 lh-1 text-body-tertiary">{{item.spare2}}折</span>
                     </div>
                     <div class="button-area p-3 pt-0">
                       <div class="row g-1 mt-2">
@@ -1574,7 +1584,10 @@
         const params = new URLSearchParams(queryString);
         let type =   params.get("type")
         that.loading = true
-        that.queryParams.userid = that.userId
+        // 只有在用户已登录时才设置userid
+        if (that.userId) {
+          that.queryParams.userid = that.userId
+        }
         if (typeId == 'all'){
           window.location.href = "/web/userproductlist"
         }
@@ -1591,13 +1604,23 @@
           type: "GET",
           data: that.queryParams,
           success: function (data) {
+            console.log("API Response:", data);
+            console.log("Data list:", data.list);
+            console.log("Data total:", data.total);
             if (data.code !== 500) {
               that.loading = false
               that.dataList = data.list
               that.total = data.total
+              console.log("Updated dataList:", that.dataList);
+              console.log("Updated total:", that.total);
+            } else {
+              console.error("API returned error code 500:", data.msg);
             }
           },
-          error: function () {
+          error: function (xhr, status, error) {
+            console.error("AJAX Error:", error);
+            console.error("Status:", status);
+            console.error("Response:", xhr.responseText);
             windowsAuto(500, "服务器异常！network error！")
           }
         });
@@ -1633,6 +1656,28 @@
         });
       },
 
+      // 计算商品价格（考虑折扣）
+      calculateItemPrice(item) {
+        if (!item || !item.kedanjia) {
+          return '0.00';
+        }
+
+        const originalPrice = parseFloat(item.kedanjia);
+        if (isNaN(originalPrice)) {
+          return '0.00';
+        }
+
+        // 如果有折扣且折扣有效
+        if (item.spare2 && !isNaN(parseFloat(item.spare2))) {
+          const discount = parseFloat(item.spare2);
+          if (discount > 0 && discount < 10) {
+            return (originalPrice * discount / 10).toFixed(2);
+          }
+        }
+
+        // 没有折扣或折扣无效时，返回原价
+        return originalPrice.toFixed(2);
+      },
 
     },
     watch: {},

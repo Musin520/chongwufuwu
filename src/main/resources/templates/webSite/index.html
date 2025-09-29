@@ -281,10 +281,9 @@
                                         销量：<span>(222)</span>
                                     </div>
                                     <div class="d-flex justify-content-center align-items-center gap-2">
-                                        <span>￥ {{item.kedanjia}}</span>
-                                        <span class="text-dark fw-semibold">{{ (parseFloat(item.kedanjia) * parseFloat(item.spare2) / 10).toFixed(2)
-                                            }}</span>
-                                        <span class="badge border border-dark-subtle rounded-0 fw-normal px-1 fs-7 lh-1 text-body-tertiary">{{item.spare2}}折</span>
+                                        <del v-if="item.spare2 && !isNaN(parseFloat(item.spare2)) && parseFloat(item.spare2) < 10" class="text-muted">￥ {{item.kedanjia}}</del>
+                                        <span class="text-dark fw-semibold">￥ {{calculateItemPrice(item)}}</span>
+                                        <span v-if="item.spare2 && !isNaN(parseFloat(item.spare2)) && parseFloat(item.spare2) < 10" class="badge border border-dark-subtle rounded-0 fw-normal px-1 fs-7 lh-1 text-body-tertiary">{{item.spare2}}折</span>
                                     </div>
                                     <div class="button-area p-3 pt-0">
                                         <div class="row g-1 mt-2">
@@ -381,10 +380,9 @@
                                        销量： <span>(222)</span>
                                     </div>
                                     <div class="d-flex justify-content-center align-items-center gap-2">
-                                        <del>￥{{item.kedanjia}}</del>
-                                        <span class="text-dark fw-semibold">￥{{parseFloat(item.kedanjia) * parseFloat(item.spare2) / 10
-                                          }}</span>
-                                        <span class="badge border border-dark-subtle rounded-0 fw-normal px-1 fs-7 lh-1 text-body-tertiary">{{item.spare2}}折</span>
+                                        <del v-if="item.spare2 && !isNaN(parseFloat(item.spare2)) && parseFloat(item.spare2) < 10" class="text-muted">￥{{item.kedanjia}}</del>
+                                        <span class="text-dark fw-semibold">￥{{calculateItemPrice(item)}}</span>
+                                        <span v-if="item.spare2 && !isNaN(parseFloat(item.spare2)) && parseFloat(item.spare2) < 10" class="badge border border-dark-subtle rounded-0 fw-normal px-1 fs-7 lh-1 text-body-tertiary">{{item.spare2}}折</span>
                                     </div>
                                     <div class="button-area p-3 pt-0">
                                         <div class="row g-1 mt-2">
@@ -817,6 +815,29 @@ if (number === null || number === 0 || number == undefined){
                         alert("服务器异常！network error！")
                     }
                 })
+            },
+
+            // 计算商品价格（考虑折扣）
+            calculateItemPrice(item) {
+                if (!item || !item.kedanjia) {
+                    return '0.00';
+                }
+
+                const originalPrice = parseFloat(item.kedanjia);
+                if (isNaN(originalPrice)) {
+                    return '0.00';
+                }
+
+                // 如果有折扣且折扣有效
+                if (item.spare2 && !isNaN(parseFloat(item.spare2))) {
+                    const discount = parseFloat(item.spare2);
+                    if (discount > 0 && discount < 10) {
+                        return (originalPrice * discount / 10).toFixed(2);
+                    }
+                }
+
+                // 没有折扣或折扣无效时，返回原价
+                return originalPrice.toFixed(2);
             },
         },
         watch: {},

@@ -940,7 +940,7 @@
                      data: {id:that.userId},
                      success: function (data) {
                          if (data.code !== 500) {
-                             that.userInfo = data.Data
+                             that.userInfo = data.data
                              // 如果是服务商，获取服务商信息
                              if (that.role === '3') {
                                  that.getCompanyInfo()
@@ -960,7 +960,7 @@
                      data: {createid: that.userId},
                      success: function (data) {
                          if (data.code !== 500) {
-                             that.companyInfo = data.Data || {}
+                             that.companyInfo = data.data || {}
                          }
                      },
                      error: function () {

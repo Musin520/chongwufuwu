@@ -423,7 +423,13 @@
       selectedDiscountTotal() {
         return this.selectedItems.reduce((total, item) => {
           const price = parseFloat(item.product.kedanjia || 0);
-          const discount = parseFloat(item.product.spare2 || 10);
+          let discount = 10; // 默认无折扣
+          if (item.product.spare2 && !isNaN(parseFloat(item.product.spare2))) {
+            const discountValue = parseFloat(item.product.spare2);
+            if (discountValue > 0 && discountValue < 10) {
+              discount = discountValue;
+            }
+          }
           const quantity = parseInt(item.number || 0);
           return total + (price * discount / 10 * quantity);
         }, 0).toFixed(2);
@@ -484,7 +490,14 @@
               let sumAfter = 0
               that.dataList && that.dataList.forEach((el)=>{
                 sum = sum + (el.product.kedanjia * el.number)
-                sumAfter = sumAfter + (el.product.kedanjia *el.product.spare2 / 10  * el.number)
+                let discount = 10; // 默认无折扣
+                if (el.product.spare2 && !isNaN(parseFloat(el.product.spare2))) {
+                  const discountValue = parseFloat(el.product.spare2);
+                  if (discountValue > 0 && discountValue < 10) {
+                    discount = discountValue;
+                  }
+                }
+                sumAfter = sumAfter + (el.product.kedanjia * discount / 10 * el.number)
               })
               that.total = data.total
               that.sumAfter = sumAfter

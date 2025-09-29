@@ -29,7 +29,7 @@ function getRole(){
       "id":Glo_user
     },
     success: function (data) {
-      role =  data.Data.role
+      role =  data.data.role
     },
     error: function () {
       alert("服务器异常！network error！")

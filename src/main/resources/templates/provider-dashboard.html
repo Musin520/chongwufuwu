@@ -256,18 +256,18 @@ new Vue({
                 success: function (data) {
                     console.log("获取仪表板数据响应:", data);
                     if (data.code === 200) {
-                        if (data.Data) {
+                        if (data.data) {
                             // 修复数据结构匹配问题
-                            that.dashboardData = data.Data.Data || {
+                            that.dashboardData = data.data.data || {
                                 totalOrders: 0,
                                 totalRevenue: 0,
                                 avgRating: 0,
                                 totalServices: 0
                             };
-                            that.serviceTypeData = data.Data.serviceTypeData || [];
-                            that.ratingData = data.Data.ratingData || [];
-                            that.orderTrendData = data.Data.orderTrendData || [];
-                            that.recentOrders = data.Data.recentOrders || [];
+                            that.serviceTypeData = data.data.serviceTypeData || [];
+                            that.ratingData = data.data.ratingData || [];
+                            that.orderTrendData = data.data.orderTrendData || [];
+                            that.recentOrders = data.data.recentOrders || [];
 
                             console.log("仪表板数据加载成功:", that.dashboardData);
 

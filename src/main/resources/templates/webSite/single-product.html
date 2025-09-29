@@ -144,13 +144,17 @@
               <div class="element-header">
                 <h2 itemprop="name">{{productInfo.productname}}</h2>
                 <div class="rating-container d-flex gap-0 align-items-center">
-
-                  <span class="rating-count">折扣： <strong style="color: red"> {{productInfo.spare2}}</strong>  折</span>
+                  <span class="rating-count" v-if="productInfo.spare2 && !isNaN(parseFloat(productInfo.spare2)) && parseFloat(productInfo.spare2) < 10">
+                    折扣： <strong style="color: red"> {{productInfo.spare2}}</strong>  折
+                  </span>
+                  <span class="rating-count" v-else>
+                    <strong style="color: green">原价销售</strong>
+                  </span>
                 </div>
               </div>
               <div class="product-price pt-3 pb-3">
-                <strong class="text-primary display-6 fw-bold">￥{{(parseFloat(productInfo.kedanjia) * parseFloat(productInfo.spare2) / 10).toFixed(2) }}</strong>
-                <del class="ms-2">￥{{productInfo.kedanjia}}</del>
+                <strong class="text-primary display-6 fw-bold">￥{{calculateDiscountPrice()}}</strong>
+                <del class="ms-2" v-if="productInfo.spare2 && parseFloat(productInfo.spare2) < 10">￥{{productInfo.kedanjia}}</del>
               </div>
 
               <div class="cart-wrap py-4">
@@ -627,19 +631,23 @@
               id:that.id
             },
             success: function (data) {
+              console.log("Product Detail API Response:", data);
               if (data.code !== 500) {
-                that.productInfo = data.Data
+                that.productInfo = data.data
+                console.log("Product Info:", that.productInfo);
                 // 安全检查detailImgList是否存在且不为空
-                if (data.Data.detailImgList && data.Data.detailImgList.length > 0) {
-                  that.currentImgInfo = data.Data.detailImgList[0]
+                if (data.data.detailImgList && data.data.detailImgList.length > 0) {
+                  that.currentImgInfo = data.data.detailImgList[0]
                 } else {
                   // 如果detailImgList为空，使用主图片
-                  that.currentImgInfo = data.Data.img
+                  that.currentImgInfo = data.data.img
                 }
                 that.getList()
 
                 // 获取最新的服务商评分统计
                 that.updateCompanyRating();
+              } else {
+                console.error("Product Detail API returned error:", data.msg);
               }
             },
             error: function () {
@@ -715,7 +723,7 @@
             },
             success: function (data) {
               if (data.code === 200) {
-                that.providerInfo = data.Data;
+                that.providerInfo = data.data;
               } else {
                 toastr.error("获取服务商信息失败", '提示');
               }
@@ -851,6 +859,29 @@
           if (this.$refs.chatMessages) {
             this.$refs.chatMessages.scrollTop = this.$refs.chatMessages.scrollHeight;
           }
+        },
+
+        // 计算折扣价格
+        calculateDiscountPrice() {
+          if (!this.productInfo || !this.productInfo.kedanjia) {
+            return '0.00';
+          }
+
+          const originalPrice = parseFloat(this.productInfo.kedanjia);
+          if (isNaN(originalPrice)) {
+            return '0.00';
+          }
+
+          // 如果有折扣且折扣有效
+          if (this.productInfo.spare2 && !isNaN(parseFloat(this.productInfo.spare2))) {
+            const discount = parseFloat(this.productInfo.spare2);
+            if (discount > 0 && discount < 10) {
+              return (originalPrice * discount / 10).toFixed(2);
+            }
+          }
+
+          // 没有折扣或折扣无效时，返回原价
+          return originalPrice.toFixed(2);
         },
 
       },

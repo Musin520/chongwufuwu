@@ -45,6 +45,11 @@ public class WebController {
         return "login";
     }
 
+    @GetMapping("test-api")
+    public String testApi(){
+        return "test-api";
+    }
+
     @GetMapping({"/user"})
     public String user() {
         return "user/index";
@@ -116,6 +121,11 @@ public String companyindex() {
 @GetMapping({"/provider/dashboard"})
 public String providerDashboard() {
     return "provider-dashboard";
+}
+
+@GetMapping("/test-user-info")
+public String testUserInfo() {
+    return "test-user-info";
 }
 
 }
